@@ -16,7 +16,7 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 - **Story:** Allows users to save details/memorabilia from their trips and also assists in planning future trips.
 - **Market:** Anyone that travels can enjoy this app. They can plan and save travel itineraries, and share them with other people, making it a more personable and interactive experience.
 - **Habit:** This would mainly be used before, during, and after a planned trip. This app is more habit forming with an explore page, allowing users to endlessly scroll through various travel destinations and itineraries.
-- **Scope:** A narrow focused version of this app would be the ability to add  locations from a trip, formulate the journey on Google Maps, and being able to share the itinerary for public viewing on the explore page. Additional features would include adding pictures for each location and displaying trip metrics (miles driven, hours traveleld, etc.). 
+- **Scope:** A narrow focused version of this app would be the ability to add  locations from a trip, formulate the journey on Google Maps, and being able to share the itinerary for public viewing on the explore page. Additional features would include adding pictures for each location and displaying trip metrics (miles driven, hours traveleld, etc.).
 
 ## Product Spec
 
@@ -77,3 +77,6 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 * Itinerary Details
     * Personal Feed
     * Create a Trip
+
+## Wireframes
+<img src="./wireframe.jpg" width=600>
