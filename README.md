@@ -24,22 +24,22 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 
 **Required Must-have Stories**
 
-[ ] User can create a new account
-[ ] User can login
-[ ] User can "Create a New Trip"
-[ ] User can add locations from their trip
-[ ] User can view feed of their itineraries
-[ ] User can view a detailed view of existing itinerary
+- [ ] User can create a new account
+- [ ] User can login
+- [ ] User can "Create a New Trip"
+- [ ] User can add locations from their trip
+- [ ] User can view feed of their itineraries
+- [ ] User can view a detailed view of existing itinerary
 
 **Optional Nice-to-have Stories**
 
-[ ] User can make their trip public
-[ ] User can see their itinerary and other user's itineraries in the Explore page, if public
-[ ] User can share itinerary with other users they choose
-[ ] User can add pictures to specific locations in their itinerary
-[ ] User can save other users' itineraries
-[ ] User can search in the Explore page to find other users' itineraries
-[ ] User can view trip metrics
+- [ ] User can make their trip public
+- [ ] User can see their itinerary and other user's itineraries in the Explore page, if public
+- [ ] User can share itinerary with other users they choose
+- [ ] User can add pictures to specific locations in their itinerary
+- [ ] User can save other users' itineraries
+- [ ] User can search in the Explore page to find other users' itineraries
+- [ ] User can view trip metrics
 
 ### 2. Screen Archetypes
 
