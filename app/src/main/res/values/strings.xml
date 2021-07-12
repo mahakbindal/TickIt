@@ -7,4 +7,6 @@
     <string name="signup_fail">Issue with sign up</string>
     <string name="signup_success">Sign Up Success</string>
     <string name="logout">Logged out!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
