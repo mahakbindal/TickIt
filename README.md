@@ -28,8 +28,9 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 - [ ] User can login
 - [ ] User can "Create a New Trip"
 - [ ] User can add locations from their trip
+- [ ] User can generate a map with trip route based on locations (Google Maps API)
 - [ ] User can view feed of their itineraries
-- [ ] User can view a detailed view of existing itinerary
+- [ ] User can open a detailed view of existing itinerary
 
 **Optional Nice-to-have Stories**
 
