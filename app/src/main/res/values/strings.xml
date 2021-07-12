@@ -2,4 +2,8 @@
     <string name="app_name">TickIt</string>
     <string name="login_fail">Issue with login</string>
     <string name="login_success">Login Success</string>
+    <string name="empty_field">One or more fields are empty</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="signup_fail">Issue with sign up</string>
+    <string name="signup_success">Sign Up Success</string>
 </resources>

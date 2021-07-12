@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
             goMainActivity();
         }
 
+        // User attempts to login
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,6 +39,20 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(username, password);
             }
         });
+
+        // User attempts to go to sign up activity
+        binding.btnLoginSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goSignUpActivity();
+            }
+        });
+    }
+
+    private void goSignUpActivity() {
+        Intent i = new Intent(this, SignUpActivity.class);
+        startActivity(i);
+        finish();
     }
 
     private void loginUser(String username, String password) {
