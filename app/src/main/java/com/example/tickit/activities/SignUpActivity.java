@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.tickit.MainActivity;
 import com.example.tickit.R;
 import com.example.tickit.databinding.ActivitySignUpBinding;
 import com.parse.ParseException;

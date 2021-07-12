@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TickIt">
         <activity android:name=".activities.SignUpActivity"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".activities.MainActivity" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

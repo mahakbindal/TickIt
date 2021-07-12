@@ -6,4 +6,5 @@
     <string name="password_mismatch">Passwords do not match</string>
     <string name="signup_fail">Issue with sign up</string>
     <string name="signup_success">Sign Up Success</string>
+    <string name="logout">Logged out!</string>
 </resources>
