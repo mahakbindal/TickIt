@@ -9,12 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.tickit.R;
@@ -32,6 +36,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,6 +49,7 @@ public class CreateFragment extends Fragment {
     private FragmentCreateBinding mBinding;
     GoogleMap mGoogleMap;
     public List<List<Address>> mLocations;
+    public List<LatLng> mLatLngList;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -56,6 +62,7 @@ public class CreateFragment extends Fragment {
 //        View view = inflater.inflate(R.layout.fragment_create, container, false);
         mBinding = FragmentCreateBinding.inflate(inflater, container, false);
 
+
         // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -64,27 +71,8 @@ public class CreateFragment extends Fragment {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
-                // Add polylines to the map.
-                // Polylines are useful to show a route or some other connection between points.
-                // [START maps_poly_activity_add_polyline_set_tag]
-                // [START maps_poly_activity_add_polyline]
+
                 mGoogleMap = googleMap;
-                Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
-                        .clickable(true)
-                        .add(
-                                new LatLng(-35.016, 143.321),
-                                new LatLng(-34.747, 145.592),
-                                new LatLng(-34.364, 147.891),
-                                new LatLng(-33.501, 150.217),
-                                new LatLng(-32.306, 149.248),
-                                new LatLng(-32.491, 147.309)));
-                // [END maps_poly_activity_add_polyline]
-                // [START_EXCLUDE silent]
-                // Store a data object with the polyline, used here to indicate an arbitrary type.
-                polyline1.setTag("A");
-                // Position the map's camera near Alice Springs in the center of Australia,
-                // and set the zoom factor so most of Australia shows on the screen.
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-23.684, 133.903), 4));
 
             }
         });
@@ -99,36 +87,60 @@ public class CreateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mLocations = new ArrayList<>();
+                mLatLngList = new ArrayList<>();
                 geoLocate(v);
             }
         });
     }
 
     private void geoLocate(View v) {
-        String location1 = mBinding.etLocation1.getText().toString();
-        String location2 = mBinding.etLocation2.getText().toString();
+        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2));
+
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
-            List<Address> addressList = geocoder.getFromLocationName(location1, 1);
-            Log.i(TAG, "addressList: " + addressList);
+            for(int id: locationId) {
+                EditText et = (EditText) getView().findViewById(id);
+                String loc = et.getText().toString();
+                Log.i(TAG, "locations: " + loc);
 
+                List<Address> addressList = geocoder.getFromLocationName(loc, 1);
+                mLocations.add(addressList);
+                Log.i(TAG, "address: " + mLocations);
+            }
 
-            if(!addressList.isEmpty()){
-                Address address = addressList.get(0);
+            for(List<Address> location : mLocations) {
+                if(location.isEmpty()) {
+                    Toast.makeText(getContext(), R.string.invalid_location, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Address address = location.get(0);
                 goToLocation(address.getLatitude(), address.getLongitude());
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mLatLngList.add(latLng);
+                Log.i(TAG, "latlng points: " + mLatLngList);
                 mGoogleMap.addMarker(new MarkerOptions().position(latLng));
-
-                Toast.makeText(getContext(), address.getLocality(), Toast.LENGTH_SHORT).show();
+                drawPolyline();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void drawPolyline() {
+
+        // Add polylines to the map.
+        // Polylines are useful to show a route or some other connection between points.
+        // [START maps_poly_activity_add_polyline_set_tag]
+        // [START maps_poly_activity_add_polyline]
+        Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
+                .clickable(true)
+                .addAll(mLatLngList));
+        // [END maps_poly_activity_add_polyline]
+    }
+
     private void goToLocation(double latitude, double longitude) {
         LatLng latLng = new LatLng(latitude, longitude);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 4);
         mGoogleMap.moveCamera(cameraUpdate);
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
