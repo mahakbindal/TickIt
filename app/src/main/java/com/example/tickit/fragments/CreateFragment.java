@@ -49,6 +49,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -103,13 +105,24 @@ public class CreateFragment extends Fragment {
             public void onClick(View v) {
                 mLocations = new ArrayList<>();
                 mLatLngList = new ArrayList<>();
-                geoLocate(v);
+                geoLocate();
             }
         });
     }
 
-    private void geoLocate(View v) {
-        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2));
+    // Call getFromLocation in gelocation() in background thread; not currently used
+    private void launchGeolocate() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                geoLocate();
+            }
+        });
+    }
+
+    private void geoLocate() {
+        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2, R.id.etLocation3));
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
             for(int id: locationId) {
@@ -132,15 +145,12 @@ public class CreateFragment extends Fragment {
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mLatLngList.add(latLng);
                 Log.i(TAG, "latlng points: " + mLatLngList);
-                Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng));
-                if(mLocations.indexOf(location) == 1){
-                    Log.i(TAG, "Current location: " + location);
-                    calculateDirections(marker);
-                }
+
 
                 mGoogleMap.addMarker(new MarkerOptions().position(latLng));
 //                drawPolyline();
             }
+            calculateDirections();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -165,16 +175,21 @@ public class CreateFragment extends Fragment {
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
-    private void calculateDirections(Marker marker){
+    private void calculateDirections(){
         Log.d(TAG, "calculateDirections: calculating directions.");
         List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(mLatLngList);
 
         com.google.maps.model.LatLng destination = convertedLatLngList.get(convertedLatLngList.size()-1);
-        LatLng dst = mLatLngList.get(1);
         DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
+
 
         directions.alternatives(false);
         directions.origin(convertedLatLngList.get(0));
+        Log.i(TAG, "size: " + mLatLngList.size());
+        if(mLatLngList.size() > 2) {
+            List<com.google.maps.model.LatLng> waypointsList = convertedLatLngList.subList(1, convertedLatLngList.size()-1);
+            directions.waypoints(waypointsList.toArray(new com.google.maps.model.LatLng[waypointsList.size()]));
+        }
         Log.i(TAG, "Origin location: " + mLatLngList.get(0));
         Log.d(TAG, "calculateDirections: destination: " + destination.toString());
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
@@ -193,6 +208,7 @@ public class CreateFragment extends Fragment {
         });
     }
 
+    // https://github.com/googlemaps/google-maps-services-java
     private void addPolylinesToMap(final DirectionsResult result){
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
