@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -60,6 +61,7 @@ public class CreateFragment extends Fragment {
     public static final String TAG = "CreateFragment";
     private FragmentCreateBinding mBinding;
     GoogleMap mGoogleMap;
+    ImageButton mIbRemove;
     public List<List<Address>> mLocations;
     public List<LatLng> mLatLngList;
     private GeoApiContext mGeoApiContext = null;
@@ -84,7 +86,6 @@ public class CreateFragment extends Fragment {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
-
                 mGoogleMap = googleMap;
 
             }
@@ -93,36 +94,48 @@ public class CreateFragment extends Fragment {
         if(mGeoApiContext == null) {
             mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
         }
+
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mIbRemove = (ImageButton) getView().findViewById(R.id.ibRemove);
 
         mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mGoogleMap.clear();
                 mLocations = new ArrayList<>();
                 mLatLngList = new ArrayList<>();
                 geoLocate();
             }
         });
-    }
 
-    // Call getFromLocation in gelocation() in background thread; not currently used
-    private void launchGeolocate() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(new Runnable() {
+        mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                geoLocate();
+            public void onClick(View v) {
+                addWaypointView();
             }
         });
+
+    }
+
+    // https://github.com/droidcodes/DynamicViews/blob/master/app/src/main/java/com/dynamicviews/MainActivity.java
+    private void addWaypointView() {
+        final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
+//        mIbRemove.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mBinding.layoutList.removeView(waypointView);
+//            }
+//        });
+        mBinding.layoutList.addView(waypointView);
     }
 
     private void geoLocate() {
-        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2, R.id.etLocation3));
+        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2));
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
             for(int id: locationId) {
@@ -154,18 +167,6 @@ public class CreateFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void drawPolyline() {
-
-        // Add polylines to the map.
-        // Polylines are useful to show a route or some other connection between points.
-        // [START maps_poly_activity_add_polyline_set_tag]
-        // [START maps_poly_activity_add_polyline]
-        Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .addAll(mLatLngList));
-        // [END maps_poly_activity_add_polyline]
     }
 
     private void goToLocation(double latitude, double longitude) {
@@ -247,5 +248,28 @@ public class CreateFragment extends Fragment {
             resultList.add(new com.google.maps.model.LatLng(item.latitude, item.longitude));
         }
         return resultList;
+    }
+
+    // Call getFromLocation in gelocation() in background thread; not currently used
+    private void launchGeolocate() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                geoLocate();
+            }
+        });
+    }
+
+    private void drawPolyline() {
+
+        // Add polylines to the map.
+        // Polylines are useful to show a route or some other connection between points.
+        // [START maps_poly_activity_add_polyline_set_tag]
+        // [START maps_poly_activity_add_polyline]
+        Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
+                .clickable(true)
+                .addAll(mLatLngList));
+        // [END maps_poly_activity_add_polyline]
     }
 }
