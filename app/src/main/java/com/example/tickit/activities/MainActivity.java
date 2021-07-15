@@ -71,4 +71,9 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void updateTrips(){
+        mFragmentManager.beginTransaction().replace(R.id.flContainer, new TripsFragment()).commit();
+        mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
+    }
 }

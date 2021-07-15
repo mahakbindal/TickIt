@@ -29,6 +29,7 @@ import com.example.tickit.R;
 import com.example.tickit.Trip;
 import com.example.tickit.TripDetails;
 import com.example.tickit.WaypointView;
+import com.example.tickit.activities.MainActivity;
 import com.example.tickit.databinding.FragmentCreateBinding;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -300,6 +301,7 @@ public class CreateFragment extends Fragment {
                         return;
                     }
                     Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
+
                 }
             });
         }

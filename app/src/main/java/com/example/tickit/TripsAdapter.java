@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.parse.ParseFile;
 
 import java.util.List;
 
@@ -42,6 +43,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         Trip trip = mTrips.get(position);
         holder.mRootView.setTag(trip);
         holder.mTvTripName.setText(trip.getTitle());
+        ParseFile image = trip.getImage();
+        Glide.with(mContext).load(image.getUrl()).into(holder.mIvTripPic);
 
         CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
             @Override
@@ -67,6 +70,18 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return mTrips.size();
+    }
+
+    // Clean all elements of the recycler
+    public void clear() {
+        mTrips.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(List<Trip> list) {
+        mTrips.addAll(list);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

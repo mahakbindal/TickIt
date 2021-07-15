@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,13 +56,37 @@ public class TripsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Lookup the swipe container view
+        // Setup refresh listener which triggers new data loading
+        mBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchTimelineAsync(0);
+            }
+        });
+        // Configure the refreshing colors
+        mBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         mAllTrips = new ArrayList<>();
-        queryTrips();
+
         mAdapter = new TripsAdapter(getContext(), mAllTrips);
 
         mGridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvTrips.setAdapter(mAdapter);
         mBinding.rvTrips.setLayoutManager(mGridLayoutManager);
+        queryTrips();
+    }
+
+    private void fetchTimelineAsync(int page) {
+        mAdapter.clear();
+        queryTrips();
+        mBinding.swipeContainer.setRefreshing(false);
     }
 
     private void queryTrips() {
