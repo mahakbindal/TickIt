@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.tickit.R;
+import com.example.tickit.WaypointView;
 import com.example.tickit.databinding.FragmentCreateBinding;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -65,9 +66,11 @@ public class CreateFragment extends Fragment {
     public List<List<Address>> mLocations;
     public List<LatLng> mLatLngList;
     private GeoApiContext mGeoApiContext = null;
+    public List<WaypointView> mWaypointsList;
 
     public CreateFragment() {
         // Required empty public constructor
+        mWaypointsList = new ArrayList<>();
     }
 
     @Override
@@ -91,9 +94,14 @@ public class CreateFragment extends Fragment {
             }
         });
 
+        // Initialize Google Maps Directions API to calculate routes
         if(mGeoApiContext == null) {
             mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
         }
+
+        // Initialize minimum two waypoint/location fields
+        addWaypointView();
+        addWaypointView();
 
         return mBinding.getRoot();
     }
@@ -125,35 +133,41 @@ public class CreateFragment extends Fragment {
     // https://github.com/droidcodes/DynamicViews/blob/master/app/src/main/java/com/dynamicviews/MainActivity.java
     private void addWaypointView() {
         final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
+        if(mWaypointsList.size() != 25) {
+            WaypointView newWaypoint = new WaypointView(getContext());
+            mWaypointsList.add(newWaypoint);
+            mBinding.layoutList.addView(newWaypoint);
+        }
 //        mIbRemove.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                mBinding.layoutList.removeView(waypointView);
 //            }
 //        });
-        mBinding.layoutList.addView(waypointView);
+
+    }
+
+    public void getWaypointInput(Geocoder geocoder) throws IOException {
+        List<String> locations = new ArrayList<>();
+        for(int i = 0; i < mWaypointsList.size(); i++) {
+            String loc = mWaypointsList.get(i).getEditTextValue();
+            locations.add(loc);
+            List<Address> addressList = geocoder.getFromLocationName(loc, 1);
+            mLocations.add(addressList);
+        }
+        Log.i(TAG, "String locations: " + locations);
     }
 
     private void geoLocate() {
-        ArrayList<Integer> locationId = new ArrayList<>(Arrays.asList(R.id.etLocation1, R.id.etLocation2));
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
-            for(int id: locationId) {
-                EditText et = (EditText) getView().findViewById(id);
-                String loc = et.getText().toString();
-                Log.i(TAG, "locations: " + loc);
-
-                List<Address> addressList = geocoder.getFromLocationName(loc, 1);
-                mLocations.add(addressList);
-                Log.i(TAG, "address: " + mLocations);
-            }
-
+            getWaypointInput(geocoder);
             for(List<Address> location : mLocations) {
                 if(location.isEmpty()) {
                     Toast.makeText(getContext(), R.string.invalid_location, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Address address = location.get(0);
+                Address address = location.get(0); // gets the first result google retrieves from addressList
                 goToLocation(address.getLatitude(), address.getLongitude());
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mLatLngList.add(latLng);
