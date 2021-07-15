@@ -14,39 +14,12 @@
             android:layout_height="match_parent"
             android:id="@+id/linear_create_fragment"
             android:orientation="vertical">
-<!--            <EditText-->
-<!--                android:id="@+id/etLocation1"-->
-<!--                android:layout_width="350dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentStart="true"-->
-<!--                android:layout_alignParentTop="true"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginEnd="50dp"-->
-<!--                android:ems="10"-->
-<!--                android:inputType="textPersonName"-->
-<!--                android:hint="Origin" />-->
 
             <LinearLayout
                 android:id="@+id/layout_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"></LinearLayout>
-
-<!--            <EditText-->
-<!--                android:id="@+id/etLocation2"-->
-<!--                android:layout_width="350dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_below="@+id/etLocation1"-->
-<!--                android:layout_alignParentStart="true"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginTop="10dp"-->
-<!--                android:layout_marginEnd="50dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Destination"-->
-<!--                android:inputType="textPersonName" />-->
 
             <LinearLayout
                 android:id="@+id/layout_button"
@@ -60,7 +33,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="125dp"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/olive"
+                    android:backgroundTint="@color/light_teal"
                     android:text="Add" />
 
                 <Button
@@ -83,6 +56,15 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp" />
+
+            <Button
+                android:id="@+id/btnCreate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="270dp"
+                android:layout_marginTop="-10dp"
+                android:backgroundTint="@color/scarlet"
+                android:text="Create" />
         </LinearLayout>
     </ScrollView>
 
