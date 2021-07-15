@@ -297,6 +297,7 @@ public class CreateFragment extends Fragment {
                     if(e != null) {
                         Log.e(TAG, "Error while creating");
                         Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
+                        return;
                     }
                     Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
                 }
@@ -309,6 +310,7 @@ public class CreateFragment extends Fragment {
                 if(e != null) {
                     Log.e(TAG, "Error while creating");
                     Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
             }

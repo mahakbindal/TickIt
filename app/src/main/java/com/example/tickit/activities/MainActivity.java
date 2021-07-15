@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
     }
 
     @Override
