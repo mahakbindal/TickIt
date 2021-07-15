@@ -26,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.tickit.R;
+import com.example.tickit.Trip;
+import com.example.tickit.TripDetails;
 import com.example.tickit.WaypointView;
 import com.example.tickit.databinding.FragmentCreateBinding;
 import com.google.android.gms.maps.CameraUpdate;
@@ -45,6 +47,10 @@ import com.google.maps.PendingResult;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,11 +134,20 @@ public class CreateFragment extends Fragment {
             }
         });
 
+        mBinding.btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                String title = mBinding.etTitle.getText().toString();
+                saveTrip(currentUser, title);
+            }
+        });
+
     }
 
     // https://github.com/droidcodes/DynamicViews/blob/master/app/src/main/java/com/dynamicviews/MainActivity.java
     private void addWaypointView() {
-        final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
+//        final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
         if(mWaypointsList.size() != 25) {
             WaypointView newWaypoint = new WaypointView(getContext());
             mWaypointsList.add(newWaypoint);
@@ -141,7 +156,7 @@ public class CreateFragment extends Fragment {
 //        mIbRemove.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                mBinding.layoutList.removeView(waypointView);
+//                mBinding.layoutList.removeView(v);
 //            }
 //        });
 
@@ -262,6 +277,42 @@ public class CreateFragment extends Fragment {
             resultList.add(new com.google.maps.model.LatLng(item.latitude, item.longitude));
         }
         return resultList;
+    }
+
+    private void saveTrip(ParseUser currentUser, String title) {
+        Trip trip = new Trip();
+        trip.setTitle(title);
+        trip.setUser(currentUser);
+
+        for(int i = 0; i < mWaypointsList.size(); i++) {
+            TripDetails tripDetails = new TripDetails();
+            tripDetails.setTrip(trip);
+            String loc = mWaypointsList.get(i).getEditTextValue();
+            tripDetails.setLocation(loc);
+            tripDetails.setLocationIndex(i);
+
+            tripDetails.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e != null) {
+                        Log.e(TAG, "Error while creating");
+                        Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
+                    }
+                    Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        trip.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e != null) {
+                    Log.e(TAG, "Error while creating");
+                    Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
+                }
+                Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Call getFromLocation in gelocation() in background thread; not currently used

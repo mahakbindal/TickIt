@@ -10,7 +10,7 @@ public class Trip extends ParseObject {
 
     public static final String KEY_USER = "user";
     public static final String KEY_IMAGE = "image";
-    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_TITLE = "title";
 
     public ParseUser getUser() {
         return getParseUser(KEY_USER);
@@ -28,11 +28,11 @@ public class Trip extends ParseObject {
         put(KEY_IMAGE, image);
     }
 
-    public String getDescription() {
-        return getString(KEY_DESCRIPTION);
+    public String getTitle() {
+        return getString(KEY_TITLE);
     }
 
-    public void setDescription(String description) {
-        put(KEY_DESCRIPTION, description);
+    public void setTitle(String title) {
+        put(KEY_TITLE, title);
     }
 }

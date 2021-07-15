@@ -19,5 +19,7 @@ public class WaypointView extends LinearLayout {
         return mWaypoint.getText().toString();
     }
 
-
+    public void setEditTextValue(String text) {
+        mWaypoint.setText(text);
+    }
 }

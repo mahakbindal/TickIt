@@ -23,7 +23,7 @@ public class TripDetails extends ParseObject {
         return getString(KEY_LOCATION);
     }
 
-    public void setTrip(String location) {
+    public void setLocation(String location) {
         put(KEY_LOCATION, location);
     }
 
