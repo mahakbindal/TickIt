@@ -1,6 +1,7 @@
 package com.example.tickit;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -17,12 +18,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.tickit.activities.TripDetailsActivity;
 import com.parse.ParseFile;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
+    public static final String TRIP = "trip";
     static Context mContext;
     private List<Trip> mTrips;
 
@@ -34,8 +39,20 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     @NonNull
     @Override
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip, parent, false);
-        return new ViewHolder(itemView, mContext);
+//        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip, parent, false);
+//        return new ViewHolder(itemView, mContext);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Trip trip = mTrips.get(viewHolder.getAdapterPosition());
+                Intent intent = new Intent(mContext, TripDetailsActivity.class);
+                intent.putExtra(TRIP, Parcels.wrap(trip));
+                mContext.startActivity(intent);
+            }
+        });
+        return viewHolder;
     }
 
     @Override
@@ -45,26 +62,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         holder.mTvTripName.setText(trip.getTitle());
         ParseFile image = trip.getImage();
         Glide.with(mContext).load(image.getUrl()).into(holder.mIvTripPic);
-
-        CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-
-                // TODO 2. Use generate() method from the Palette API to get the vibrant color from the bitmap
-                // Set the result as the background color for `holder.vPalette` view containing the contact's name.
-                Palette palette = Palette.from(resource).generate();
-                Palette.Swatch vibrant = palette.getVibrantSwatch();
-                if (vibrant != null) {
-                    // Set the background color of a layout based on the vibrant color
-                    holder.mVPalette.setBackgroundColor(vibrant.getRgb());
-                }
-            }
-
-            @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
-                // can leave empty
-            }
-        };
     }
 
     @Override
@@ -91,7 +88,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         private View mVPalette;
         private TextView mTvTripName;
 
-        public ViewHolder(@NonNull View itemView, Context context) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mRootView = itemView;
             mIvTripPic = itemView.findViewById(R.id.ivTripPic);

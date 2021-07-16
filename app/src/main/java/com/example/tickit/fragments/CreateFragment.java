@@ -141,6 +141,7 @@ public class CreateFragment extends Fragment {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 String title = mBinding.etTitle.getText().toString();
                 saveTrip(currentUser, title);
+//                ((MainActivity)getActivity()).updateTrips();
             }
         });
 
