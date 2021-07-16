@@ -56,7 +56,6 @@ public class TripDetailsActivity extends AppCompatActivity {
     }
 
     private void addLocationDetailsView() {
-        Log.i(TAG, "Trip details list: " + mTripDetails);
         for(int i = 0; i < mTripDetails.size(); i++) {
             LocationDetailsView newLocation = new LocationDetailsView(this);
             mLocationDetails.add(newLocation);
@@ -70,7 +69,6 @@ public class TripDetailsActivity extends AppCompatActivity {
         query.include(TripDetails.KEY_TRIP);
         ParseObject tripObjId = ParseObject.createWithoutData(TRIP_CLASS, trip.getObjectId());
         query.whereEqualTo(TripDetails.KEY_TRIP, tripObjId);
-        Log.i(TAG, "Trip object id: " + trip.getObjectId());
         query.addAscendingOrder(TripDetails.KEY_LOCATION_INDEX);
 
         query.findInBackground(new FindCallback<TripDetails>() {
@@ -82,7 +80,6 @@ public class TripDetailsActivity extends AppCompatActivity {
                     return;
                 }
                 mTripDetails.addAll(tripDetails);
-                Log.i(TAG, "List" + mTripDetails.toString());
                 addLocationDetailsView();
             }
         });

@@ -38,6 +38,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -67,6 +68,9 @@ import java.util.concurrent.Executors;
 public class CreateFragment extends Fragment {
 
     public static final String TAG = "CreateFragment";
+    public static final int WAYPOINT_LIMIT = 10;
+    public static final int ADDRESS_RETRIEVAL_MAX = 1;
+
     private FragmentCreateBinding mBinding;
     GoogleMap mGoogleMap;
     ImageButton mIbRemove;
@@ -74,6 +78,7 @@ public class CreateFragment extends Fragment {
     public List<LatLng> mLatLngList;
     private GeoApiContext mGeoApiContext = null;
     public List<WaypointView> mWaypointsList;
+    public List<MarkerOptions> mMarkerList;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -124,6 +129,7 @@ public class CreateFragment extends Fragment {
                 mGoogleMap.clear();
                 mLocations = new ArrayList<>();
                 mLatLngList = new ArrayList<>();
+                mMarkerList = new ArrayList<>();
                 geoLocate();
             }
         });
@@ -147,10 +153,10 @@ public class CreateFragment extends Fragment {
 
     }
 
-    // https://github.com/droidcodes/DynamicViews/blob/master/app/src/main/java/com/dynamicviews/MainActivity.java
+    /* Adds additional waypoints when user clicks the "Add" button */
     private void addWaypointView() {
 //        final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
-        if(mWaypointsList.size() != 25) {
+        if(mWaypointsList.size() != WAYPOINT_LIMIT) {
             WaypointView newWaypoint = new WaypointView(getContext());
             mWaypointsList.add(newWaypoint);
             mBinding.layoutList.addView(newWaypoint);
@@ -164,12 +170,14 @@ public class CreateFragment extends Fragment {
 
     }
 
+    /* Retrieves user input/location from each waypoint views, and converts input into a valid
+    Address. Populates mLocations with the Address list. */
     public void getWaypointInput(Geocoder geocoder) throws IOException {
         List<String> locations = new ArrayList<>();
         for(int i = 0; i < mWaypointsList.size(); i++) {
             String loc = mWaypointsList.get(i).getEditTextValue();
             locations.add(loc);
-            List<Address> addressList = geocoder.getFromLocationName(loc, 1);
+            List<Address> addressList = geocoder.getFromLocationName(loc, ADDRESS_RETRIEVAL_MAX);
             mLocations.add(addressList);
         }
         Log.i(TAG, "String locations: " + locations);
@@ -185,45 +193,50 @@ public class CreateFragment extends Fragment {
                     return;
                 }
                 Address address = location.get(0); // gets the first result google retrieves from addressList
-                goToLocation(address.getLatitude(), address.getLongitude());
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mLatLngList.add(latLng);
                 Log.i(TAG, "latlng points: " + mLatLngList);
 
 
-                mGoogleMap.addMarker(new MarkerOptions().position(latLng));
+                MarkerOptions marker = new MarkerOptions();
+                mGoogleMap.addMarker(marker.position(latLng));
+                mMarkerList.add(marker);
 //                drawPolyline();
             }
+            goToLocation();
             calculateDirections();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void goToLocation(double latitude, double longitude) {
-        LatLng latLng = new LatLng(latitude, longitude);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 4);
+    /* Updates camera view of map based marker position */
+    private void goToLocation() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(MarkerOptions marker : mMarkerList) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
         mGoogleMap.moveCamera(cameraUpdate);
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
+    /* Calculates the route between a minimum of two locations (origin and destination), and includes
+    * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map. */
     private void calculateDirections(){
-        Log.d(TAG, "calculateDirections: calculating directions.");
         List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(mLatLngList);
 
         com.google.maps.model.LatLng destination = convertedLatLngList.get(convertedLatLngList.size()-1);
         DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
 
-
         directions.alternatives(false);
         directions.origin(convertedLatLngList.get(0));
-        Log.i(TAG, "size: " + mLatLngList.size());
-        if(mLatLngList.size() > 2) {
+        // Retrieves the waypoints between origin and destination
+        if(convertedLatLngList.size() > 2) {
             List<com.google.maps.model.LatLng> waypointsList = convertedLatLngList.subList(1, convertedLatLngList.size()-1);
             directions.waypoints(waypointsList.toArray(new com.google.maps.model.LatLng[waypointsList.size()]));
         }
-        Log.i(TAG, "Origin location: " + mLatLngList.get(0));
-        Log.d(TAG, "calculateDirections: destination: " + destination.toString());
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
             public void onResult(DirectionsResult result) {
@@ -235,12 +248,12 @@ public class CreateFragment extends Fragment {
             @Override
             public void onFailure(Throwable e) {
                 Log.e(TAG, "onFailure: ", e);
-
             }
         });
     }
 
-    // https://github.com/googlemaps/google-maps-services-java
+    /* Draws route on map based on the result/directions received from calculateDirections.
+    *  Source: https://github.com/googlemaps/google-maps-services-java */
     private void addPolylinesToMap(final DirectionsResult result){
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -272,7 +285,9 @@ public class CreateFragment extends Fragment {
         });
     }
 
-    // https://stackoverflow.com/questions/60245464/different-latlng-imports
+    /* Helper to convert LatLng coordinates from com.google.android.gms.maps.model.LatLng to
+    * com.google.maps.model.LatLng (type required to calculate directions).
+    * Source: https://stackoverflow.com/questions/60245464/different-latlng-imports */
     static List<com.google.maps.model.LatLng> convertCoordType(List<com.google.android.gms.maps.model.LatLng> list) {
         List<com.google.maps.model.LatLng> resultList = new ArrayList<>();
         for (com.google.android.gms.maps.model.LatLng item : list) {
@@ -281,11 +296,13 @@ public class CreateFragment extends Fragment {
         return resultList;
     }
 
+    /* Saves trip in Parse database along with trip details in respective tables.*/
     private void saveTrip(ParseUser currentUser, String title) {
         Trip trip = new Trip();
         trip.setTitle(title);
         trip.setUser(currentUser);
 
+        // Iterate through mWaypointsList to save each location in TripDetails table
         for(int i = 0; i < mWaypointsList.size(); i++) {
             TripDetails tripDetails = new TripDetails();
             tripDetails.setTrip(trip);
