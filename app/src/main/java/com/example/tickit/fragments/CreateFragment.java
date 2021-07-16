@@ -196,10 +196,12 @@ public class CreateFragment extends Fragment {
                     return;
                 }
                 Address address = location.get(0); // gets the first result google retrieves from addressList
+                Log.i(TAG, "Address" + address);
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                String markerTitle = address.getAddressLine(0);
                 mLatLngList.add(latLng);
                 Log.i(TAG, "latlng points: " + mLatLngList);
-                addMarkers(latLng);
+                addMarkers(latLng, markerTitle);
 //                drawPolyline();
             }
             goToLocation();
@@ -210,9 +212,11 @@ public class CreateFragment extends Fragment {
     }
 
     /* Adds markers to the map based on the latitude and longitude of the location. */
-    private void addMarkers(LatLng latLng) {
+    private void addMarkers(LatLng latLng, String markerTitle) {
         MarkerOptions marker = new MarkerOptions();
-        mGoogleMap.addMarker(marker.position(latLng));
+        mGoogleMap.addMarker(marker
+                .position(latLng)
+                .title(markerTitle));
         mMarkerList.add(marker);
     }
 
