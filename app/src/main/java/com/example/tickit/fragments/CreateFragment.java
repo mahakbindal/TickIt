@@ -3,6 +3,7 @@ package com.example.tickit.fragments;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -68,6 +69,7 @@ import java.util.concurrent.Executors;
 public class CreateFragment extends Fragment {
 
     public static final String TAG = "CreateFragment";
+    public static final int CAMERA_PADDING = 100;
     public static final int WAYPOINT_LIMIT = 10;
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
 
@@ -183,6 +185,7 @@ public class CreateFragment extends Fragment {
         Log.i(TAG, "String locations: " + locations);
     }
 
+    /* Retrieves the addresses of the locations, creates LatLng object that is appended to mLatLngList. */
     private void geoLocate() {
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
@@ -196,11 +199,7 @@ public class CreateFragment extends Fragment {
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mLatLngList.add(latLng);
                 Log.i(TAG, "latlng points: " + mLatLngList);
-
-
-                MarkerOptions marker = new MarkerOptions();
-                mGoogleMap.addMarker(marker.position(latLng));
-                mMarkerList.add(marker);
+                addMarkers(latLng);
 //                drawPolyline();
             }
             goToLocation();
@@ -210,6 +209,13 @@ public class CreateFragment extends Fragment {
         }
     }
 
+    /* Adds markers to the map based on the latitude and longitude of the location. */
+    private void addMarkers(LatLng latLng) {
+        MarkerOptions marker = new MarkerOptions();
+        mGoogleMap.addMarker(marker.position(latLng));
+        mMarkerList.add(marker);
+    }
+
     /* Updates camera view of map based marker position */
     private void goToLocation() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -217,7 +223,7 @@ public class CreateFragment extends Fragment {
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, CAMERA_PADDING);
         mGoogleMap.moveCamera(cameraUpdate);
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
@@ -268,9 +274,6 @@ public class CreateFragment extends Fragment {
 
                     // This loops through all the LatLng coordinates of ONE polyline.
                     for(com.google.maps.model.LatLng latLng: decodedPath){
-
-//                        Log.d(TAG, "run: latlng: " + latLng.toString());
-
                         newDecodedPath.add(new LatLng(
                                 latLng.lat,
                                 latLng.lng
