@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +35,7 @@ import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -67,8 +72,10 @@ import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,6 +94,7 @@ public class CreateFragment extends Fragment {
     public static final int CAMERA_PADDING = 100;
     public static final int WAYPOINT_LIMIT = 10;
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
+    public final static int PICK_PHOTO_CODE = 1046;
     public static final int IMAGE_PICK_CODE = 1000;
     public static final int PERMISSION_CODE = 1001;
 
@@ -99,9 +107,7 @@ public class CreateFragment extends Fragment {
     private GeoApiContext mGeoApiContext = null;
     public List<WaypointView> mWaypointsList;
     public List<MarkerOptions> mMarkerList;
-    private File mPhotoFile;
-
-    CursorAdapter myAdapter;
+    private ParseFile mPhotoFile;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -169,23 +175,13 @@ public class CreateFragment extends Fragment {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 String title = mBinding.etTitle.getText().toString();
                 saveTrip(currentUser, title);
-//                ((MainActivity)getActivity()).updateTrips();
             }
         });
 
         mBinding.btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
-                        requestPermissions(permissions, PERMISSION_CODE);
-                    } else {
-                        chooseImageFromGallery();
-                    }
-                } else {
-                    chooseImageFromGallery();
-                }
+                onPickPhoto();
             }
         });
 
@@ -343,12 +339,65 @@ public class CreateFragment extends Fragment {
         return resultList;
     }
 
+    // Trigger gallery selection for a photo
+    public void onPickPhoto() {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
+    }
+
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if(Build.VERSION.SDK_INT > 27){
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(getContext().getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ((data != null) && requestCode == PICK_PHOTO_CODE) {
+            Uri photoUri = data.getData();
+
+            // Load the image located at photoUri into selectedImage
+            Bitmap selectedImage = loadFromUri(photoUri);
+
+            mBinding.ivTripImage.setImageBitmap(selectedImage);
+            mPhotoFile = conversionBitmapParseFile(selectedImage);
+        }
+    }
+
+    public ParseFile conversionBitmapParseFile(Bitmap imageBitmap){
+        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        byte[] imageByte = byteArrayOutputStream.toByteArray();
+        ParseFile parseFile = new ParseFile("image_file.png",imageByte);
+        return parseFile;
+    }
+
     /* Saves trip in Parse database along with trip details in respective tables.*/
     private void saveTrip(ParseUser currentUser, String title) {
         Trip trip = new Trip();
         trip.setTitle(title);
         trip.setUser(currentUser);
-//        trip.setImage(new ParseFile(mPhotoFile));
+        trip.setImage(mPhotoFile);
 
         // Iterate through mWaypointsList to save each location in TripDetails table
         for(int i = 0; i < mWaypointsList.size(); i++) {
@@ -367,7 +416,7 @@ public class CreateFragment extends Fragment {
                         Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -384,51 +433,6 @@ public class CreateFragment extends Fragment {
                 ((MainActivity)getActivity()).updateTrips();
             }
         });
-    }
-
-    private void chooseImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-
-        startActivityForResult(intent, IMAGE_PICK_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_CODE: {
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    chooseImageFromGallery();
-                } else {
-                    Toast.makeText(getContext(), "Permission denied", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            mBinding.ivTripImage.setImageURI(data.getData());
-            mPhotoFile = getPhotoFileUri(mPhotoFileName);
-        }
-    }
-
-    public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(TAG, "failed to create directory");
-        }
-
-        // Return the file target for the photo based on filename
-        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-
-        return file;
     }
 
     private void drawPolyline() {
