@@ -1,9 +1,15 @@
 package com.example.tickit.fragments;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,13 +19,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -51,10 +60,14 @@ import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +75,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,7 +87,10 @@ public class CreateFragment extends Fragment {
     public static final int CAMERA_PADDING = 100;
     public static final int WAYPOINT_LIMIT = 10;
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
+    public static final int IMAGE_PICK_CODE = 1000;
+    public static final int PERMISSION_CODE = 1001;
 
+    public String mPhotoFileName = "photo.jpg";
     private FragmentCreateBinding mBinding;
     GoogleMap mGoogleMap;
     ImageButton mIbRemove;
@@ -81,6 +99,9 @@ public class CreateFragment extends Fragment {
     private GeoApiContext mGeoApiContext = null;
     public List<WaypointView> mWaypointsList;
     public List<MarkerOptions> mMarkerList;
+    private File mPhotoFile;
+
+    CursorAdapter myAdapter;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -91,7 +112,6 @@ public class CreateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Initialize view
-//        View view = inflater.inflate(R.layout.fragment_create, container, false);
         mBinding = FragmentCreateBinding.inflate(inflater, container, false);
 
 
@@ -153,6 +173,22 @@ public class CreateFragment extends Fragment {
             }
         });
 
+        mBinding.btnSelectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
+                        requestPermissions(permissions, PERMISSION_CODE);
+                    } else {
+                        chooseImageFromGallery();
+                    }
+                } else {
+                    chooseImageFromGallery();
+                }
+            }
+        });
+
     }
 
     /* Adds additional waypoints when user clicks the "Add" button */
@@ -160,27 +196,31 @@ public class CreateFragment extends Fragment {
 //        final View waypointView = getLayoutInflater().inflate(R.layout.add_row_waypoint, null, false);
         if(mWaypointsList.size() != WAYPOINT_LIMIT) {
             WaypointView newWaypoint = new WaypointView(getContext());
+            newWaypoint.setOnClickListenerToRemove(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    WaypointView waypointView = (WaypointView) v.getParent().getParent();
+                    mWaypointsList.remove(waypointView);
+                    mBinding.layoutList.removeView(waypointView);
+                }
+            });
             mWaypointsList.add(newWaypoint);
             mBinding.layoutList.addView(newWaypoint);
         }
-//        mIbRemove.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mBinding.layoutList.removeView(v);
-//            }
-//        });
 
     }
 
     /* Retrieves user input/location from each waypoint views, and converts input into a valid
     Address. Populates mLocations with the Address list. */
     public void getWaypointInput(Geocoder geocoder) throws IOException {
+
         List<String> locations = new ArrayList<>();
         for(int i = 0; i < mWaypointsList.size(); i++) {
             String loc = mWaypointsList.get(i).getEditTextValue();
             locations.add(loc);
             List<Address> addressList = geocoder.getFromLocationName(loc, ADDRESS_RETRIEVAL_MAX);
             mLocations.add(addressList);
+            Log.e(TAG, String.valueOf(mLocations.get(i)));
         }
         Log.i(TAG, "String locations: " + locations);
     }
@@ -308,12 +348,14 @@ public class CreateFragment extends Fragment {
         Trip trip = new Trip();
         trip.setTitle(title);
         trip.setUser(currentUser);
+//        trip.setImage(new ParseFile(mPhotoFile));
 
         // Iterate through mWaypointsList to save each location in TripDetails table
         for(int i = 0; i < mWaypointsList.size(); i++) {
             TripDetails tripDetails = new TripDetails();
             tripDetails.setTrip(trip);
             String loc = mWaypointsList.get(i).getEditTextValue();
+            mWaypointsList.get(i).setEditTextValue("");
             tripDetails.setLocation(loc);
             tripDetails.setLocationIndex(i);
 
@@ -342,17 +384,52 @@ public class CreateFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
             }
         });
+//        ((MainActivity)getActivity()).updateTrips();
     }
 
-    // Call getFromLocation in gelocation() in background thread; not currently used
-    private void launchGeolocate() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                geoLocate();
+    private void chooseImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+
+        startActivityForResult(intent, IMAGE_PICK_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CODE: {
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    chooseImageFromGallery();
+                } else {
+                    Toast.makeText(getContext(), "Permission denied", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
+            mBinding.ivTripImage.setImageURI(data.getData());
+            mPhotoFile = getPhotoFileUri(mPhotoFileName);
+        }
+    }
+
+    public File getPhotoFileUri(String fileName) {
+        // Get safe storage directory for photos
+        // Use `getExternalFilesDir` on Context to access package-specific directories.
+        // This way, we don't need to request external read/write runtime permissions.
+        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+            Log.d(TAG, "failed to create directory");
+        }
+
+        // Return the file target for the photo based on filename
+        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
+
+        return file;
     }
 
     private void drawPolyline() {
