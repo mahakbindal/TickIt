@@ -95,8 +95,6 @@ public class CreateFragment extends Fragment {
     public static final int WAYPOINT_LIMIT = 10;
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
     public final static int PICK_PHOTO_CODE = 1046;
-    public static final int IMAGE_PICK_CODE = 1000;
-    public static final int PERMISSION_CODE = 1001;
 
     public String mPhotoFileName = "photo.jpg";
     private FragmentCreateBinding mBinding;
@@ -384,11 +382,13 @@ public class CreateFragment extends Fragment {
         }
     }
 
+    /* Given an image of type Bitmap, converts the image into a ParseFile and returns it.
+    * Source: https://findnerd.com/list/view/Convert-Bitmap-to-ParseFile-in-android/11025/ */
     public ParseFile conversionBitmapParseFile(Bitmap imageBitmap){
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         imageBitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
         byte[] imageByte = byteArrayOutputStream.toByteArray();
-        ParseFile parseFile = new ParseFile("image_file.png",imageByte);
+        ParseFile parseFile = new ParseFile(mPhotoFileName,imageByte);
         return parseFile;
     }
 
@@ -397,7 +397,9 @@ public class CreateFragment extends Fragment {
         Trip trip = new Trip();
         trip.setTitle(title);
         trip.setUser(currentUser);
-        trip.setImage(mPhotoFile);
+        if(mPhotoFile != null) {
+            trip.setImage(mPhotoFile);
+        }
 
         // Iterate through mWaypointsList to save each location in TripDetails table
         for(int i = 0; i < mWaypointsList.size(); i++) {
@@ -416,7 +418,6 @@ public class CreateFragment extends Fragment {
                         Toast.makeText(getContext(), R.string.create_error, Toast.LENGTH_SHORT).show();
                         return;
                     }
-//                    Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -27,19 +27,6 @@ public class WaypointView extends LinearLayout {
         mWaypoint.setText(text);
     }
 
-    public void clickRemove(LinearLayout layout) {
-        mRemove.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layout.removeView(v);
-            }
-        });
-    }
-
-    public int getRemoveId() {
-        return mRemove.getId();
-    }
-
     public void setOnClickListenerToRemove(OnClickListener onClickListener){
         mRemove.setOnClickListener(onClickListener);
     }
