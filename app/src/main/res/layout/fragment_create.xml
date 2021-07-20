@@ -27,6 +27,13 @@
                 android:hint="Trip Title"
                 android:inputType="textPersonName" />
 
+            <ImageView
+                android:id="@+id/ivTripImage"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                app:srcCompat="@mipmap/image_holder_foreground"
+                tools:src="@tools:sample/avatars" />
+
             <LinearLayout
                 android:id="@+id/layout_list"
                 android:layout_width="match_parent"
@@ -40,22 +47,30 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btnSelectImage"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="@color/light_teal"
+                    android:text="Select Image" />
+
+                <Button
                     android:id="@+id/btnAdd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="125dp"
+                    android:layout_marginStart="5dp"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/light_teal"
+                    android:backgroundTint="@color/olive"
                     android:text="Add" />
 
                 <Button
                     android:id="@+id/btnRoute"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/btnAdd"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/olive"
+                    android:backgroundTint="@color/scarlet"
                     android:text="View Route" />
             </LinearLayout>
 
@@ -78,21 +93,7 @@
                 android:backgroundTint="@color/scarlet"
                 android:text="Create" />
 
-            <ImageView
-                android:id="@+id/ivTripImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:src="@tools:sample/avatars" />
 
-            <Button
-                android:id="@+id/btnSelectImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/btnAdd"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="@color/olive"
-                android:text="Select Image" />
         </LinearLayout>
 
     </ScrollView>

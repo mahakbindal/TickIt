@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.location.Address;
 import android.location.Geocoder;
@@ -40,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.tickit.BitmapScaler;
 import com.example.tickit.MapRoute;
 import com.example.tickit.R;
 import com.example.tickit.Trip;
@@ -76,6 +78,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -227,7 +230,7 @@ public class CreateFragment extends Fragment {
         // Create intent for picking a photo from the gallery
         Intent intent = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        
+
         startActivityForResult(intent, PICK_PHOTO_CODE);
 //        if (intent.resolveActivity(mContext.getPackageManager()) != null) {
 //            // Bring up gallery to select a photo
@@ -260,10 +263,42 @@ public class CreateFragment extends Fragment {
 
             // Load the image located at photoUri into selectedImage
             Bitmap selectedImage = loadFromUri(photoUri);
+//            Bitmap rawTakenImage = BitmapFactory.decodeFile(photoUri.getPath());
+//            Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, 100);
+//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+//            File resizedFile = getPhotoFileUri(mPhotoFileName + "_resized");
+//            try {
+//                resizedFile.createNewFile();
+//                FileOutputStream fos = new FileOutputStream(resizedFile);
+//                fos.write(bytes.toByteArray());
+//                fos.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
+
+//            mPhotoFile = new ParseFile(resizedFile);
+//            mBinding.ivTripImage.setImageBitmap(resizedBitmap);
             mBinding.ivTripImage.setImageBitmap(selectedImage);
             mPhotoFile = conversionBitmapParseFile(selectedImage);
         }
+    }
+
+    public File getPhotoFileUri(String fileName) {
+        // Get safe storage directory for photos
+        // Use `getExternalFilesDir` on Context to access package-specific directories.
+        // This way, we don't need to request external read/write runtime permissions.
+        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        }
+
+        // Return the file target for the photo based on filename
+        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
+
+        return file;
     }
 
     /* Given an image of type Bitmap, converts the image into a ParseFile and returns it.
