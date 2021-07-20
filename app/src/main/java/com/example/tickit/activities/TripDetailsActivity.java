@@ -85,17 +85,13 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         queryTripDetails(mTrip);
 
+    }
+
+    private void initTripDetails() {
+        addLocationDetailsView();
         populateLatLngList();
-        Log.i(TAG, "LatLng List: " + mLatLngList);
-
-        mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MapRoute mapRoute = new MapRoute(mContext, mGoogleMap, mGeoApiContext, mLatLngList);
-                mapRoute.calculateDirections(mMarkerTitle);
-            }
-        });
-
+        MapRoute mapRoute = new MapRoute(mContext, mGoogleMap, mGeoApiContext, mLatLngList);
+        mapRoute.calculateDirections(mMarkerTitle);
     }
 
     private void addLocationDetailsView() {
@@ -135,8 +131,7 @@ public class TripDetailsActivity extends AppCompatActivity {
                 }
                 mTripDetails.addAll(tripDetails);
                 Log.i(TAG, "trip details: " + mTripDetails);
-                addLocationDetailsView();
-                populateLatLngList();
+                initTripDetails();
             }
         });
     }

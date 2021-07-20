@@ -37,7 +37,7 @@ public class MapRoute {
     public static final int CAMERA_PADDING = 100;
 
     public Context mContext;
-    public List<List<Address>> mLocations;
+    public List<List<Address>> mLocationsList;
     public List<LatLng> mLatLngList;
     public List<MarkerOptions> mMarkerList;
     private GeoApiContext mGeoApiContext = null;
@@ -47,35 +47,34 @@ public class MapRoute {
         this.mContext = context;
         this.mGoogleMap = googleMap;
         this.mGeoApiContext = geoApiContext;
-        mLocations = new ArrayList<>();
+        mLocationsList = new ArrayList<>();
         this.mLatLngList = latLngList;
         mMarkerList = new ArrayList<>();
     }
 
-    /* Retrieves the addresses of the locations, creates LatLng object that is appended to mLatLngList. */
+    /* Converts each user input from rawLocationList to a valid address by calling Google's Geocoder
+    * API. Adds each address to mLocationsList, and retrieves the latitude and longitude of each
+    * address which is appended to mLatLngList.  */
     public void geoLocate(List<String> rawLocationList) throws IOException {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
         List<String> markerTitleList = new ArrayList<>();
         for(String rawLocation : rawLocationList) {
             List<Address> addressList = geocoder.getFromLocationName(rawLocation, ADDRESS_RETRIEVAL_MAX);
-            mLocations.add(addressList);
-        }
-        for(List<Address> location : mLocations) {
-            if(location.isEmpty()) {
+            if(addressList.isEmpty()) {
                 Toast.makeText(mContext, R.string.invalid_location, Toast.LENGTH_SHORT).show();
                 return;
             }
-            Address address = location.get(0); // gets the first result google retrieves from addressList
-            Log.i(TAG, "Address" + address);
+            mLocationsList.add(addressList);
+            Address address = addressList.get(0);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             markerTitleList.add(address.getAddressLine(0));
             mLatLngList.add(latLng);
-//                drawPolyline();
+//            drawPolyline();
         }
         calculateDirections(markerTitleList);
     }
 
-    /* Adds markers to the map based on the latitude and longitude of the location. */
+    /* Adds markers to the map based on the latitude and longitude of each location. */
     private void addMarkers(List<String> markerTitleList) {
         for(int i = 0; i < mLatLngList.size(); i++) {
             MarkerOptions marker = new MarkerOptions();
@@ -86,7 +85,7 @@ public class MapRoute {
         }
     }
 
-    /* Updates camera view of map based marker position */
+    /* Updates camera view of map based each marker position. */
     private void goToLocation() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for(MarkerOptions marker : mMarkerList) {
@@ -99,7 +98,8 @@ public class MapRoute {
     }
 
     /* Calculates the route between a minimum of two locations (origin and destination), and includes
-     * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map. */
+     * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map.
+     * Also calls methods for adding markers, and shifting camera to appropriate view. */
     public void calculateDirections(List<String> markerTitleList){
         addMarkers(markerTitleList);
         goToLocation();
@@ -183,5 +183,5 @@ public class MapRoute {
         // [END maps_poly_activity_add_polyline]
     }
 
-    public List<List<Address>> getLocationList() { return mLocations; }
+    public List<List<Address>> getLocationList() { return mLocationsList; }
 }
