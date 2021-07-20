@@ -1,6 +1,7 @@
 package com.example.tickit;
 
 import com.parse.ParseClassName;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
 @ParseClassName("TripDetails")
@@ -9,7 +10,8 @@ public class TripDetails extends ParseObject {
     public static final String KEY_TRIP = "trip";
     public static final String KEY_LOCATION = "location";
     public static final String KEY_LOCATION_INDEX = "locationIndex";
-    public static final String DESCRIPTION = "description";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_LATLNG = "latLng";
 
     public ParseObject getTrip() {
         return getParseObject(KEY_TRIP);
@@ -36,10 +38,18 @@ public class TripDetails extends ParseObject {
     }
 
     public String getDescription() {
-        return getString(DESCRIPTION);
+        return getString(KEY_DESCRIPTION);
     }
 
     public void setDescription(String description) {
-        put(DESCRIPTION, description);
+        put(KEY_DESCRIPTION, description);
+    }
+
+    public ParseGeoPoint getLatLng() {
+        return getParseGeoPoint(KEY_LATLNG);
+    }
+
+    public void setLatLng(ParseGeoPoint latLng) {
+        put(KEY_LATLNG, latLng);
     }
 }

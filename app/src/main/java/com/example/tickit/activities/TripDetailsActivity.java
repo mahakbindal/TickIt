@@ -1,20 +1,29 @@
 package com.example.tickit.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import com.example.tickit.LocationDetailsView;
+import com.example.tickit.MapRoute;
 import com.example.tickit.R;
 import com.example.tickit.Trip;
 import com.example.tickit.TripDetails;
 import com.example.tickit.databinding.ActivityTripDetailsBinding;
 import com.example.tickit.fragments.CreateFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.GeoApiContext;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -30,9 +39,15 @@ public class TripDetailsActivity extends AppCompatActivity {
     public static final String TRIP_CLASS = "Trip";
 
     public ActivityTripDetailsBinding mBinding;
+    private Context mContext;
+    GoogleMap mGoogleMap;
+    private GeoApiContext mGeoApiContext = null;
+
     public Trip mTrip;
     private List<TripDetails> mTripDetails;
     private List<LocationDetailsView> mLocationDetails;
+    private List<LatLng> mLatLngList;
+    private List<String> mMarkerTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,24 +58,63 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         mTripDetails = new ArrayList<>();
         mLocationDetails = new ArrayList<>();
+        mLatLngList = new ArrayList<>();
 
         Intent intent = getIntent();
         mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP));
+
+        // Initialize map fragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mapDetails);
+
+        // Async map
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull GoogleMap googleMap) {
+                mGoogleMap = googleMap;
+
+            }
+        });
+
+        // Initialize Google Maps Directions API to calculate routes
+        if(mGeoApiContext == null) {
+            mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
+        }
 
         mBinding.tvTripTitle.setText(mTrip.getTitle());
 
         queryTripDetails(mTrip);
 
-        addLocationDetailsView();
+        populateLatLngList();
+        Log.i(TAG, "LatLng List: " + mLatLngList);
+
+        mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapRoute mapRoute = new MapRoute(mContext, mGoogleMap, mGeoApiContext, mLatLngList);
+                mapRoute.calculateDirections(mMarkerTitle);
+            }
+        });
 
     }
 
     private void addLocationDetailsView() {
+        mMarkerTitle = new ArrayList<>();
         for(int i = 0; i < mTripDetails.size(); i++) {
             LocationDetailsView newLocation = new LocationDetailsView(this);
             mLocationDetails.add(newLocation);
             mBinding.locationList.addView(newLocation);
-            newLocation.setTextValue(mTripDetails.get(i).getLocation());
+            String location = mTripDetails.get(i).getLocation();
+            newLocation.setTextValue(location);
+            mMarkerTitle.add(location);
+        }
+    }
+
+    private void populateLatLngList() {
+        for(TripDetails details : mTripDetails) {
+            ParseGeoPoint geoPoint = details.getLatLng();
+            LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+            mLatLngList.add(latLng);
         }
     }
 
@@ -80,7 +134,9 @@ public class TripDetailsActivity extends AppCompatActivity {
                     return;
                 }
                 mTripDetails.addAll(tripDetails);
+                Log.i(TAG, "trip details: " + mTripDetails);
                 addLocationDetailsView();
+                populateLatLngList();
             }
         });
     }

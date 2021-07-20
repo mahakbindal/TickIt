@@ -1,0 +1,187 @@
+package com.example.tickit;
+
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class MapRoute {
+
+    public static final String TAG = "MapRoute";
+    public static final int ADDRESS_RETRIEVAL_MAX = 1;
+    public static final int CAMERA_PADDING = 100;
+
+    public Context mContext;
+    public List<List<Address>> mLocations;
+    public List<LatLng> mLatLngList;
+    public List<MarkerOptions> mMarkerList;
+    private GeoApiContext mGeoApiContext = null;
+    GoogleMap mGoogleMap;
+
+    public MapRoute(Context context, GoogleMap googleMap, GeoApiContext geoApiContext, List<LatLng> latLngList) {
+        this.mContext = context;
+        this.mGoogleMap = googleMap;
+        this.mGeoApiContext = geoApiContext;
+        mLocations = new ArrayList<>();
+        this.mLatLngList = latLngList;
+        mMarkerList = new ArrayList<>();
+    }
+
+    /* Retrieves the addresses of the locations, creates LatLng object that is appended to mLatLngList. */
+    public void geoLocate(List<String> rawLocationList) throws IOException {
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        List<String> markerTitleList = new ArrayList<>();
+        for(String rawLocation : rawLocationList) {
+            List<Address> addressList = geocoder.getFromLocationName(rawLocation, ADDRESS_RETRIEVAL_MAX);
+            mLocations.add(addressList);
+        }
+        for(List<Address> location : mLocations) {
+            if(location.isEmpty()) {
+                Toast.makeText(mContext, R.string.invalid_location, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Address address = location.get(0); // gets the first result google retrieves from addressList
+            Log.i(TAG, "Address" + address);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            markerTitleList.add(address.getAddressLine(0));
+            mLatLngList.add(latLng);
+//                drawPolyline();
+        }
+        calculateDirections(markerTitleList);
+    }
+
+    /* Adds markers to the map based on the latitude and longitude of the location. */
+    private void addMarkers(List<String> markerTitleList) {
+        for(int i = 0; i < mLatLngList.size(); i++) {
+            MarkerOptions marker = new MarkerOptions();
+            mGoogleMap.addMarker(marker
+                    .position(mLatLngList.get(i))
+                    .title(markerTitleList.get(i)));
+            mMarkerList.add(marker);
+        }
+    }
+
+    /* Updates camera view of map based marker position */
+    private void goToLocation() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(MarkerOptions marker : mMarkerList) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, CAMERA_PADDING);
+        mGoogleMap.moveCamera(cameraUpdate);
+        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
+
+    /* Calculates the route between a minimum of two locations (origin and destination), and includes
+     * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map. */
+    public void calculateDirections(List<String> markerTitleList){
+        addMarkers(markerTitleList);
+        goToLocation();
+        List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(mLatLngList);
+
+        com.google.maps.model.LatLng destination = convertedLatLngList.get(convertedLatLngList.size()-1);
+        DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
+
+        directions.alternatives(false);
+        directions.origin(convertedLatLngList.get(0));
+        // Retrieves the waypoints between origin and destination
+        if(convertedLatLngList.size() > 2) {
+            List<com.google.maps.model.LatLng> waypointsList = convertedLatLngList.subList(1, convertedLatLngList.size()-1);
+            directions.waypoints(waypointsList.toArray(new com.google.maps.model.LatLng[waypointsList.size()]));
+        }
+        directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(DirectionsResult result) {
+                Log.d(TAG, "onResult: routes: " + result.routes[0].toString());
+                Log.d(TAG, "onResult: geocodedWayPoints: " + result.geocodedWaypoints[0].toString());
+                addPolylinesToMap(result);
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                Log.e(TAG, "onFailure: ", e);
+            }
+        });
+    }
+
+    /* Draws route on map based on the result/directions received from calculateDirections.
+     *  Source: https://github.com/googlemaps/google-maps-services-java */
+    private void addPolylinesToMap(final DirectionsResult result){
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "run: result routes: " + result.routes.length);
+
+                for(DirectionsRoute route: result.routes){
+                    Log.d(TAG, "run: leg: " + route.legs[0].toString());
+                    List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+
+                    List<LatLng> newDecodedPath = new ArrayList<>();
+
+                    // This loops through all the LatLng coordinates of ONE polyline.
+                    for(com.google.maps.model.LatLng latLng: decodedPath){
+                        newDecodedPath.add(new LatLng(
+                                latLng.lat,
+                                latLng.lng
+                        ));
+                    }
+                    Polyline polyline = mGoogleMap.addPolyline(new PolylineOptions().addAll(newDecodedPath));
+//                    polyline.setColor(ContextCompat.getColor(mContext, R.color.olive));
+                    polyline.setClickable(true);
+
+                }
+            }
+        });
+    }
+
+    /* Helper to convert LatLng coordinates from com.google.android.gms.maps.model.LatLng to
+     * com.google.maps.model.LatLng (type required to calculate directions).
+     * Source: https://stackoverflow.com/questions/60245464/different-latlng-imports */
+    static List<com.google.maps.model.LatLng> convertCoordType(List<com.google.android.gms.maps.model.LatLng> list) {
+        List<com.google.maps.model.LatLng> resultList = new ArrayList<>();
+        for (com.google.android.gms.maps.model.LatLng item : list) {
+            resultList.add(new com.google.maps.model.LatLng(item.latitude, item.longitude));
+        }
+        return resultList;
+    }
+
+    private void drawPolyline() {
+
+        // Add polylines to the map.
+        // Polylines are useful to show a route or some other connection between points.
+        // [START maps_poly_activity_add_polyline_set_tag]
+        // [START maps_poly_activity_add_polyline]
+        Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
+                .clickable(true)
+                .addAll(mLatLngList));
+        // [END maps_poly_activity_add_polyline]
+    }
+
+    public List<List<Address>> getLocationList() { return mLocations; }
+}
