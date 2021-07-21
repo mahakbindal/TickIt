@@ -22,7 +22,6 @@ import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-    final FragmentManager mFragmentManager = getSupportFragmentManager();
     ActivityMainBinding mBinding;
 
     @Override
@@ -39,15 +38,15 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.action_trips:
                         fragment = new TripsFragment();
-                        Toast.makeText(MainActivity.this, "Trips", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_create:
                     default:
                         fragment = new CreateFragment();
-                        Toast.makeText(MainActivity.this, "Create trip", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.createTrip, Toast.LENGTH_SHORT).show();
                         break;
                 }
-                mFragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;
             }
         });
@@ -63,18 +62,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.logout) {
-            ParseUser.logOut();
-            Toast.makeText(this, R.string.logout, Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
-            finish();
-            return true;
+            onLogoutClicked();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateTrips(){
-        mFragmentManager.beginTransaction().replace(R.id.flContainer, new TripsFragment()).commit();
+    private boolean onLogoutClicked() {
+        ParseUser.logOut();
+        Toast.makeText(this, R.string.logout, Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+        finish();
+        return true;
+    }
+
+    /* When the create button is clicked in CreateFragment and data is saved in Parse, go to
+    * TripsFragment. */
+    public void goTripsFragment(){
+        getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, new TripsFragment()).commit();
         mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
     }
 }

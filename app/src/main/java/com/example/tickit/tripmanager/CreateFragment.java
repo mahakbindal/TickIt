@@ -319,7 +319,7 @@ public class CreateFragment extends Fragment {
                     return;
                 }
                 Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
-                ((MainActivity)getActivity()).updateTrips();
+                ((MainActivity)getActivity()).goTripsFragment();
             }
         });
     }

@@ -14,4 +14,6 @@
     <string name="create_error">Error while creating</string>
     <string name="create_success">Trip Create Success</string>
     <string name="trip_query_error">Issue with getting trips</string>
+    <string name="myTrips">My Trips</string>
+    <string name="createTrip">Create Trip</string>
 </resources>
