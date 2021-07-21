@@ -1,4 +1,4 @@
-package com.example.tickit;
+package com.example.tickit.helpers;
 
 import android.graphics.Bitmap;
 

@@ -1,4 +1,4 @@
-package com.example.tickit.fragments;
+package com.example.tickit.tripmanager;
 
 import android.os.Bundle;
 
@@ -13,16 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.tickit.R;
-import com.example.tickit.Trip;
-import com.example.tickit.TripsAdapter;
 import com.example.tickit.databinding.FragmentTripsBinding;
+import com.example.tickit.models.Trip;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;

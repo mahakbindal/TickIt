@@ -1,4 +1,4 @@
-package com.example.tickit.activities;
+package com.example.tickit.accounts;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.tickit.R;
+import com.example.tickit.main.MainActivity;
 import com.example.tickit.databinding.ActivityLoginBinding;
 import com.parse.LogInCallback;
 import com.parse.ParseException;

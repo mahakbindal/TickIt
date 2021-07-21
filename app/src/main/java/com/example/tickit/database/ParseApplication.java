@@ -1,7 +1,9 @@
-package com.example.tickit;
+package com.example.tickit.database;
 
 import android.app.Application;
 
+import com.example.tickit.models.Trip;
+import com.example.tickit.models.TripDetails;
 import com.parse.Parse;
 import com.parse.ParseObject;
 

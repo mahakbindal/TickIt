@@ -1,4 +1,4 @@
-package com.example.tickit;
+package com.example.tickit.tripmanager;
 
 import android.content.Context;
 import android.location.Address;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.tickit.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

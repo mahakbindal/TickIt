@@ -1,8 +1,10 @@
-package com.example.tickit;
+package com.example.tickit.tripmanager;
 
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.tickit.R;
 
 public class LocationDetailsView extends LinearLayout {
 

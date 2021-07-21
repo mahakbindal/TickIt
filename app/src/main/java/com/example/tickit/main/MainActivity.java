@@ -1,4 +1,4 @@
-package com.example.tickit.activities;
+package com.example.tickit.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,9 +13,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.tickit.R;
+import com.example.tickit.accounts.LoginActivity;
 import com.example.tickit.databinding.ActivityMainBinding;
-import com.example.tickit.fragments.CreateFragment;
-import com.example.tickit.fragments.TripsFragment;
+import com.example.tickit.tripmanager.CreateFragment;
+import com.example.tickit.tripmanager.TripsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 

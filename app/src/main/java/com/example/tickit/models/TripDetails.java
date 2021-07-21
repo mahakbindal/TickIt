@@ -1,4 +1,4 @@
-package com.example.tickit;
+package com.example.tickit.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseGeoPoint;

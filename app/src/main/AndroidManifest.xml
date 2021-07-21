@@ -10,17 +10,17 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".ParseApplication"
+        android:name=".database.ParseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TickIt">
-        <activity android:name=".activities.TripDetailsActivity"></activity>
-        <activity android:name=".activities.SignUpActivity" />
-        <activity android:name=".activities.MainActivity" />
-        <activity android:name=".activities.LoginActivity">
+        <activity android:name=".tripmanager.TripDetailsActivity"></activity>
+        <activity android:name=".accounts.SignUpActivity" />
+        <activity android:name=".main.MainActivity" />
+        <activity android:name=".accounts.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

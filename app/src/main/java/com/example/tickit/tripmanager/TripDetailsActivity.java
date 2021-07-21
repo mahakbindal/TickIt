@@ -1,4 +1,4 @@
-package com.example.tickit.activities;
+package com.example.tickit.tripmanager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,13 +9,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.example.tickit.LocationDetailsView;
-import com.example.tickit.MapRoute;
 import com.example.tickit.R;
-import com.example.tickit.Trip;
-import com.example.tickit.TripDetails;
 import com.example.tickit.databinding.ActivityTripDetailsBinding;
-import com.example.tickit.fragments.CreateFragment;
+import com.example.tickit.models.Trip;
+import com.example.tickit.models.TripDetails;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;

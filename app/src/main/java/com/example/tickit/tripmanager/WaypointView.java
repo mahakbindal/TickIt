@@ -1,4 +1,4 @@
-package com.example.tickit;
+package com.example.tickit.tripmanager;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
+import com.example.tickit.R;
 
 public class WaypointView extends LinearLayout {
 
