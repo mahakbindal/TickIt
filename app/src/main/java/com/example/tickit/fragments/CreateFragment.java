@@ -97,7 +97,10 @@ public class CreateFragment extends Fragment {
 
     public static final String TAG = "CreateFragment";
     public static final int WAYPOINT_LIMIT = 10;
+    public static final int LOCATION_MIN = 2;
     public final static int PICK_PHOTO_CODE = 1046;
+    public static final int IMG_WIDTH = 200;
+    public static final int IMG_QUALITY = 100;
 
     public String mPhotoFileName = "photo.jpg";
     private FragmentCreateBinding mBinding;
@@ -197,7 +200,7 @@ public class CreateFragment extends Fragment {
             newWaypoint.setOnClickListenerToRemove(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mWaypointsList.size() > 2) {
+                    if(mWaypointsList.size() > LOCATION_MIN) {
                         WaypointView waypointView = (WaypointView) v.getParent().getParent();
                         mWaypointsList.remove(waypointView);
                         mBinding.layoutList.removeView(waypointView);
@@ -265,9 +268,9 @@ public class CreateFragment extends Fragment {
             Uri photoUri = data.getData();
 
             Bitmap rawTakenImage = loadFromUri(photoUri);
-            Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, 200);
+            Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, IMG_WIDTH);
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, IMG_QUALITY, bytes);
 
             mPhotoFile = conversionBitmapParseFile(resizedBitmap);
             mBinding.ivTripImage.setImageBitmap(resizedBitmap);
@@ -278,7 +281,7 @@ public class CreateFragment extends Fragment {
     * Source: https://findnerd.com/list/view/Convert-Bitmap-to-ParseFile-in-android/11025/ */
     public ParseFile conversionBitmapParseFile(Bitmap imageBitmap){
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY,byteArrayOutputStream);
         byte[] imageByte = byteArrayOutputStream.toByteArray();
         ParseFile parseFile = new ParseFile(mPhotoFileName,imageByte);
         return parseFile;
