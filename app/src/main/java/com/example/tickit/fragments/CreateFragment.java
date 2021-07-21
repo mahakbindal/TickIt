@@ -197,9 +197,12 @@ public class CreateFragment extends Fragment {
             newWaypoint.setOnClickListenerToRemove(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    WaypointView waypointView = (WaypointView) v.getParent().getParent();
-                    mWaypointsList.remove(waypointView);
-                    mBinding.layoutList.removeView(waypointView);
+                    if(mWaypointsList.size() > 2) {
+                        WaypointView waypointView = (WaypointView) v.getParent().getParent();
+                        mWaypointsList.remove(waypointView);
+                        mBinding.layoutList.removeView(waypointView);
+                    }
+
                 }
             });
             mWaypointsList.add(newWaypoint);
@@ -261,44 +264,14 @@ public class CreateFragment extends Fragment {
         if ((data != null) && requestCode == PICK_PHOTO_CODE) {
             Uri photoUri = data.getData();
 
-            // Load the image located at photoUri into selectedImage
-            Bitmap selectedImage = loadFromUri(photoUri);
-//            Bitmap rawTakenImage = BitmapFactory.decodeFile(photoUri.getPath());
-//            Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, 100);
-//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
-//            File resizedFile = getPhotoFileUri(mPhotoFileName + "_resized");
-//            try {
-//                resizedFile.createNewFile();
-//                FileOutputStream fos = new FileOutputStream(resizedFile);
-//                fos.write(bytes.toByteArray());
-//                fos.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            Bitmap rawTakenImage = loadFromUri(photoUri);
+            Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, 200);
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-
-//            mPhotoFile = new ParseFile(resizedFile);
-//            mBinding.ivTripImage.setImageBitmap(resizedBitmap);
-            mBinding.ivTripImage.setImageBitmap(selectedImage);
-            mPhotoFile = conversionBitmapParseFile(selectedImage);
+            mPhotoFile = conversionBitmapParseFile(resizedBitmap);
+            mBinding.ivTripImage.setImageBitmap(resizedBitmap);
         }
-    }
-
-    public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-        }
-
-        // Return the file target for the photo based on filename
-        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-
-        return file;
     }
 
     /* Given an image of type Bitmap, converts the image into a ParseFile and returns it.
