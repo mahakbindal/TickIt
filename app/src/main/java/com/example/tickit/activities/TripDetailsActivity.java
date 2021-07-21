@@ -19,6 +19,7 @@ import com.example.tickit.fragments.CreateFragment;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.GeoApiContext;
 import com.parse.FindCallback;
@@ -72,7 +73,8 @@ public class TripDetailsActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
                 mGoogleMap = googleMap;
-
+                UiSettings uiSettings = mGoogleMap.getUiSettings();
+                uiSettings.setZoomControlsEnabled(true);
             }
         });
 
