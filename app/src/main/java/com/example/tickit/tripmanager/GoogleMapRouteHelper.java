@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapRoute {
+public class GoogleMapRouteHelper {
 
     public static final String TAG = "MapRoute";
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
@@ -44,12 +44,12 @@ public class MapRoute {
     private GeoApiContext mGeoApiContext = null;
     GoogleMap mGoogleMap;
 
-    public MapRoute(Context context, GoogleMap googleMap, GeoApiContext geoApiContext, List<LatLng> latLngList) {
+    public GoogleMapRouteHelper(Context context, GoogleMap googleMap, GeoApiContext geoApiContext) {
         this.mContext = context;
         this.mGoogleMap = googleMap;
         this.mGeoApiContext = geoApiContext;
         mLocationsList = new ArrayList<>();
-        this.mLatLngList = latLngList;
+        mLatLngList = new ArrayList<>();
         mMarkerList = new ArrayList<>();
     }
 
@@ -72,15 +72,16 @@ public class MapRoute {
             mLatLngList.add(latLng);
 //            drawPolyline();
         }
-        calculateDirections(markerTitleList);
+
+        calculateDirections(mLatLngList, markerTitleList);
     }
 
     /* Adds markers to the map based on the latitude and longitude of each location. */
-    private void addMarkers(List<String> markerTitleList) {
-        for(int i = 0; i < mLatLngList.size(); i++) {
+    private void addMarkers(List<String> markerTitleList, List<LatLng> latLngList) {
+        for(int i = 0; i < latLngList.size(); i++) {
             MarkerOptions marker = new MarkerOptions();
             mGoogleMap.addMarker(marker
-                    .position(mLatLngList.get(i))
+                    .position(latLngList.get(i))
                     .title(markerTitleList.get(i)));
             mMarkerList.add(marker);
         }
@@ -101,10 +102,10 @@ public class MapRoute {
     /* Calculates the route between a minimum of two locations (origin and destination), and includes
      * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map.
      * Also calls methods for adding markers, and shifting camera to appropriate view. */
-    public void calculateDirections(List<String> markerTitleList){
-        addMarkers(markerTitleList);
+    public void calculateDirections(List<LatLng> latLngList, List<String> markerTitleList){
+        addMarkers(markerTitleList, latLngList);
         goToLocation();
-        List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(mLatLngList);
+        List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(latLngList);
 
         com.google.maps.model.LatLng destination = convertedLatLngList.get(convertedLatLngList.size()-1);
         DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
@@ -153,7 +154,7 @@ public class MapRoute {
                         ));
                     }
                     Polyline polyline = mGoogleMap.addPolyline(new PolylineOptions().addAll(newDecodedPath));
-//                    polyline.setColor(ContextCompat.getColor(mContext, R.color.olive));
+                    polyline.setColor(ContextCompat.getColor(mContext, R.color.olive));
                     polyline.setClickable(true);
 
                 }

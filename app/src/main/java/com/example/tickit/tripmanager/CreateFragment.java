@@ -72,7 +72,7 @@ public class CreateFragment extends Fragment {
     public List<WaypointView> mWaypointsList;
     private WaypointView mWaypoint;
     private ParseFile mPhotoFile;
-    private MapRoute mMapRoute;
+    private GoogleMapRouteHelper mGoogleMapRouteHelper;
     private List<String> mRawLocationList;
     private Context mContext;
 
@@ -206,9 +206,8 @@ public class CreateFragment extends Fragment {
 
     /* Initializes MapRoute object and begins the call to calculate the route between locations. */
     public void getRoute() throws IOException {
-        List<LatLng> latLngList = new ArrayList<>();
-        mMapRoute = new MapRoute(getContext(), mGoogleMap, mGeoApiContext, latLngList);
-        mMapRoute.geoLocate(mRawLocationList);
+        mGoogleMapRouteHelper = new GoogleMapRouteHelper(getContext(), mGoogleMap, mGeoApiContext);
+        mGoogleMapRouteHelper.geoLocate(mRawLocationList);
     }
 
     // Trigger gallery selection for a photo
@@ -259,7 +258,7 @@ public class CreateFragment extends Fragment {
         else if(requestCode == 100 && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
             Log.i(TAG, "Place: " + place.getAddress());
-            mWaypoint.setEditTextValue(place.getName());
+            mWaypoint.setEditTextValue(place.getAddress());
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -282,7 +281,7 @@ public class CreateFragment extends Fragment {
         if(mPhotoFile != null) {
             trip.setImage(mPhotoFile);
         }
-        List<List<Address>> locations = mMapRoute.getLocationList();
+        List<List<Address>> locations = mGoogleMapRouteHelper.getLocationList();
 
         // Iterate through mWaypointsList to save each location in TripDetails table
         for(int i = 0; i < locations.size(); i++) {

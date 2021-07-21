@@ -33,14 +33,13 @@ import java.util.List;
 public class TripDetailsActivity extends AppCompatActivity {
 
     public static final String TAG = "TripDetailsActivity";
-    public static final String TRIP = "trip";
+    public static final String TRIP_EXTRA = "trip";
     public static final String TRIP_CLASS = "Trip";
 
     public ActivityTripDetailsBinding mBinding;
-    private Context mContext;
     GoogleMap mGoogleMap;
     private GeoApiContext mGeoApiContext = null;
-
+    private GoogleMapRouteHelper mRouteHelper;
     public Trip mTrip;
     private List<TripDetails> mTripDetails;
     private List<LocationDetailsView> mLocationDetails;
@@ -59,11 +58,16 @@ public class TripDetailsActivity extends AppCompatActivity {
         mLatLngList = new ArrayList<>();
 
         Intent intent = getIntent();
-        mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP));
+        mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP_EXTRA));
 
         // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapDetails);
+
+        // Initialize Google Maps Directions API to calculate routes
+        if(mGeoApiContext == null) {
+            mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
+        }
 
         // Async map
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -72,17 +76,12 @@ public class TripDetailsActivity extends AppCompatActivity {
                 mGoogleMap = googleMap;
                 UiSettings uiSettings = mGoogleMap.getUiSettings();
                 uiSettings.setZoomControlsEnabled(true);
+                mRouteHelper = new GoogleMapRouteHelper(TripDetailsActivity.this, mGoogleMap, mGeoApiContext);
+                queryTripAndInitializeUi(mTrip);
             }
         });
 
-        // Initialize Google Maps Directions API to calculate routes
-        if(mGeoApiContext == null) {
-            mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
-        }
-
         mBinding.tvTripTitle.setText(mTrip.getTitle());
-
-        queryTripDetails(mTrip);
 
     }
 
@@ -92,34 +91,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
 
-    private void initTripDetails() {
-        addLocationDetailsView();
-        populateLatLngList();
-        MapRoute mapRoute = new MapRoute(mContext, mGoogleMap, mGeoApiContext, mLatLngList);
-        mapRoute.calculateDirections(mMarkerTitle);
-    }
-
-    private void addLocationDetailsView() {
-        mMarkerTitle = new ArrayList<>();
-        for(int i = 0; i < mTripDetails.size(); i++) {
-            LocationDetailsView newLocation = new LocationDetailsView(this);
-            mLocationDetails.add(newLocation);
-            mBinding.locationList.addView(newLocation);
-            String location = mTripDetails.get(i).getLocation();
-            newLocation.setTextValue(location);
-            mMarkerTitle.add(location);
-        }
-    }
-
-    private void populateLatLngList() {
-        for(TripDetails details : mTripDetails) {
-            ParseGeoPoint geoPoint = details.getLatLng();
-            LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-            mLatLngList.add(latLng);
-        }
-    }
-
-    private void queryTripDetails(Trip trip) {
+    private void queryTripAndInitializeUi(Trip trip) {
         ParseQuery<TripDetails> query = ParseQuery.getQuery(TripDetails.class);
         query.include(TripDetails.KEY_TRIP);
         ParseObject tripObjId = ParseObject.createWithoutData(TRIP_CLASS, trip.getObjectId());
@@ -128,16 +100,44 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         query.findInBackground(new FindCallback<TripDetails>() {
             @Override
-            public void done(List<TripDetails> tripDetails, ParseException e) {
+            public void done(List<TripDetails> tripDetails, ParseException exception) {
                 Log.i(TAG, "trip details: " + tripDetails);
-                if(e != null) {
-                    Log.e(TAG, "Issue with getting trip details", e);
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting trip details", exception);
                     return;
                 }
-                mTripDetails.addAll(tripDetails);
-                Log.i(TAG, "trip details: " + mTripDetails);
-                initTripDetails();
+                setTripDetails(tripDetails);
             }
         });
+    }
+
+    private void setTripDetails(List<TripDetails> tripDetails) {
+        mTripDetails = tripDetails;
+        List<String> waypointNameList = updateWaypointList();
+        List<LatLng> waypointLatLngList = getLatLngListFromTripDetails();
+        mRouteHelper.calculateDirections(waypointLatLngList, waypointNameList);
+    }
+
+    private List<LatLng> getLatLngListFromTripDetails() {
+        List<LatLng> waypointLatLngList = new ArrayList<>();
+        for(TripDetails details : mTripDetails) {
+            ParseGeoPoint geoPoint = details.getLatLng();
+            LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+            waypointLatLngList.add(latLng);
+        }
+        return waypointLatLngList;
+    }
+
+    private List<String> updateWaypointList() {
+        List<String> waypointNameList = new ArrayList<>();
+        for(int i = 0; i < mTripDetails.size(); i++) {
+            LocationDetailsView newLocation = new LocationDetailsView(this);
+            mLocationDetails.add(newLocation);
+            mBinding.locationList.addView(newLocation);
+            String location = mTripDetails.get(i).getLocation();
+            newLocation.setTextValue(location);
+            waypointNameList.add(location);
+        }
+        return waypointNameList;
     }
 }
