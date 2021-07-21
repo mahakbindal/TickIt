@@ -62,6 +62,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -109,6 +114,7 @@ public class CreateFragment extends Fragment {
     ImageButton mIbRemove;
     private GeoApiContext mGeoApiContext = null;
     public List<WaypointView> mWaypointsList;
+    private WaypointView mWaypoint;
     private ParseFile mPhotoFile;
     private MapRoute mMapRoute;
     private List<String> mRawLocationList;
@@ -144,6 +150,11 @@ public class CreateFragment extends Fragment {
         if(mGeoApiContext == null) {
             mGeoApiContext = new GeoApiContext.Builder().apiKey(getString(R.string.google_maps_api_key)).build();
         }
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getActivity().getApplicationContext(), getString(R.string.google_maps_api_key));
+        }
+        PlacesClient placesClient = Places.createClient(mContext);
 
         // Initialize minimum two waypoint/location fields
         addWaypointView();
@@ -212,9 +223,20 @@ public class CreateFragment extends Fragment {
             });
             mWaypointsList.add(newWaypoint);
             mBinding.layoutList.addView(newWaypoint);
+
+            newWaypoint.setOnClickListenerToAutocomplete(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mWaypoint = newWaypoint;
+                    List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
+                    Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(getActivity());
+                    startActivityForResult(intent, 100);
+                }
+            });
         }
 
     }
+
 
     /* Retrieves user input/location from each waypoint views, and converts input into a valid
     Address. Populates mLocations with the Address list. */
@@ -277,6 +299,13 @@ public class CreateFragment extends Fragment {
             mPhotoFile = conversionBitmapParseFile(resizedBitmap);
             mBinding.ivTripImage.setImageBitmap(resizedBitmap);
         }
+
+        else if(requestCode == 100 && resultCode == RESULT_OK) {
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            Log.i(TAG, "Place: " + place.getAddress());
+            mWaypoint.setEditTextValue(place.getName());
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /* Given an image of type Bitmap, converts the image into a ParseFile and returns it.

@@ -30,4 +30,8 @@ public class WaypointView extends LinearLayout {
     public void setOnClickListenerToRemove(OnClickListener onClickListener){
         mRemove.setOnClickListener(onClickListener);
     }
+
+    public void setOnClickListenerToAutocomplete(OnClickListener onClickListener){
+        mWaypoint.setOnClickListener(onClickListener);
+    }
 }
