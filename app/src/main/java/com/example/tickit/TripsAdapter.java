@@ -1,5 +1,6 @@
 package com.example.tickit;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,10 +31,12 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     public static final String TRIP = "trip";
     static Context mContext;
     private List<Trip> mTrips;
+    private Activity mActivity;
 
-    public TripsAdapter(Context context, List<Trip> mTrips) {
+    public TripsAdapter(Context context, List<Trip> mTrips, Activity activity) {
         this.mContext = context;
         this.mTrips = mTrips;
+        this.mActivity = activity;
     }
 
     @NonNull
@@ -50,6 +53,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                 Intent intent = new Intent(mContext, TripDetailsActivity.class);
                 intent.putExtra(TRIP, Parcels.wrap(trip));
                 mContext.startActivity(intent);
+                mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
         });
         return viewHolder;

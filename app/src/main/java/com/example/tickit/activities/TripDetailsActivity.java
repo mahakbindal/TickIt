@@ -87,6 +87,12 @@ public class TripDetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_in, R.anim.right_out);
+    }
+
     private void initTripDetails() {
         addLocationDetailsView();
         populateLatLngList();

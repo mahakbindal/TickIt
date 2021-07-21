@@ -75,7 +75,7 @@ public class TripsFragment extends Fragment {
 
         mAllTrips = new ArrayList<>();
 
-        mAdapter = new TripsAdapter(getContext(), mAllTrips);
+        mAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity());
 
         mGridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvTrips.setAdapter(mAdapter);
