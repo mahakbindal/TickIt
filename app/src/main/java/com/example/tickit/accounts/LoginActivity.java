@@ -18,12 +18,13 @@ import com.parse.ParseUser;
 public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "LoginActivity";
+    private ActivityLoginBinding mBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityLoginBinding binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
+        mBinding = ActivityLoginBinding.inflate(getLayoutInflater());
+        View view = mBinding.getRoot();
         setContentView(view);
 
         if(ParseUser.getCurrentUser() != null) {
@@ -31,17 +32,25 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // User attempts to login
-        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
+        onLoginClicked();
+
+        // User attempts to go to sign up activity
+        onSignUpClicked();
+    }
+
+    private void onLoginClicked() {
+        mBinding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = binding.etLoginUsername.getText().toString();
-                String password = binding.etLoginPassword.getText().toString();
+                String username = mBinding.etLoginUsername.getText().toString();
+                String password = mBinding.etLoginPassword.getText().toString();
                 loginUser(username, password);
             }
         });
+    }
 
-        // User attempts to go to sign up activity
-        binding.btnLoginSignUp.setOnClickListener(new View.OnClickListener() {
+    private void onSignUpClicked() {
+        mBinding.btnLoginSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goSignUpActivity();
@@ -50,8 +59,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goSignUpActivity() {
-        Intent i = new Intent(this, SignUpActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
         finish();
     }
 

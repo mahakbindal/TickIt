@@ -18,20 +18,25 @@ import com.parse.SignUpCallback;
 public class SignUpActivity extends AppCompatActivity {
 
     public static final String TAG = "SignUpActivity";
+    private ActivitySignUpBinding mBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivitySignUpBinding binding = ActivitySignUpBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
+        mBinding = ActivitySignUpBinding.inflate(getLayoutInflater());
+        View view = mBinding.getRoot();
         setContentView(view);
 
-        binding.btnSignUp.setOnClickListener(new View.OnClickListener() {
+        onSignUpClicked();
+    }
+
+    private void onSignUpClicked() {
+        mBinding.btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = binding.etSignUpUsername.getText().toString();
-                String password = binding.etSignUpPassword.getText().toString();
-                String confirmPassword = binding.etSignUpConfirmPassword.getText().toString();
+                String username = mBinding.etSignUpUsername.getText().toString();
+                String password = mBinding.etSignUpPassword.getText().toString();
+                String confirmPassword = mBinding.etSignUpConfirmPassword.getText().toString();
                 // Error: empty field
                 if(username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                     Toast.makeText(SignUpActivity.this, R.string.empty_field, Toast.LENGTH_SHORT).show();
@@ -61,13 +66,13 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, R.string.signup_fail, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                goSignUpActivity();
+                goLoginActivity();
                 Toast.makeText(SignUpActivity.this, R.string.signup_success, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void goSignUpActivity() {
+    private void goLoginActivity() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
