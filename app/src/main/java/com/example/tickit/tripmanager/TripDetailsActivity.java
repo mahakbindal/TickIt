@@ -115,7 +115,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         mTripDetails = tripDetails;
         List<String> waypointNameList = updateWaypointList();
         List<LatLng> waypointLatLngList = getLatLngListFromTripDetails();
-        mRouteHelper.calculateDirections(waypointLatLngList, waypointNameList);
+        mRouteHelper.showRoute(waypointLatLngList, waypointNameList);
     }
 
     private List<LatLng> getLatLngListFromTripDetails() {

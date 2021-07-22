@@ -63,11 +63,11 @@ public class CreateFragment extends Fragment {
     public final static int PICK_PHOTO_CODE = 1046;
     public static final int IMG_WIDTH = 200;
     public static final int IMG_QUALITY = 100;
+    public static final int AUTOCOMPLETE_CODE = 100;
 
     public String mPhotoFileName = "photo.jpg";
     private FragmentCreateBinding mBinding;
     GoogleMap mGoogleMap;
-    ImageButton mIbRemove;
     private GeoApiContext mGeoApiContext = null;
     public List<WaypointView> mWaypointsList;
     private WaypointView mWaypoint;
@@ -110,7 +110,6 @@ public class CreateFragment extends Fragment {
         if (!Places.isInitialized()) {
             Places.initialize(getActivity().getApplicationContext(), getString(R.string.google_maps_api_key));
         }
-        PlacesClient placesClient = Places.createClient(mContext);
 
         // Initialize minimum two waypoint/location fields
         addWaypointView();
@@ -122,7 +121,6 @@ public class CreateFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mIbRemove = (ImageButton) getView().findViewById(R.id.ibRemove);
 
         mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +164,7 @@ public class CreateFragment extends Fragment {
     private void addWaypointView() {
         if(mWaypointsList.size() != WAYPOINT_LIMIT) {
             WaypointView newWaypoint = new WaypointView(getContext());
-            newWaypoint.setOnClickListenerToRemove(new View.OnClickListener() {
+            newWaypoint.setOnRemoveListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(mWaypointsList.size() > LOCATION_MIN) {
@@ -180,13 +178,13 @@ public class CreateFragment extends Fragment {
             mWaypointsList.add(newWaypoint);
             mBinding.layoutList.addView(newWaypoint);
 
-            newWaypoint.setOnClickListenerToAutocomplete(new View.OnClickListener() {
+            newWaypoint.setOnAutocompleteListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mWaypoint = newWaypoint;
                     List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
                     Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(getActivity());
-                    startActivityForResult(intent, 100);
+                    startActivityForResult(intent, AUTOCOMPLETE_CODE);
                 }
             });
         }
@@ -217,10 +215,6 @@ public class CreateFragment extends Fragment {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
         startActivityForResult(intent, PICK_PHOTO_CODE);
-//        if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-//            // Bring up gallery to select a photo
-//            startActivityForResult(intent, PICK_PHOTO_CODE);
-//        }
     }
 
     public Bitmap loadFromUri(Uri photoUri) {
@@ -255,7 +249,7 @@ public class CreateFragment extends Fragment {
             mBinding.ivTripImage.setImageBitmap(resizedBitmap);
         }
 
-        else if(requestCode == 100 && resultCode == RESULT_OK) {
+        else if(requestCode == AUTOCOMPLETE_CODE && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
             Log.i(TAG, "Place: " + place.getAddress());
             mWaypoint.setEditTextValue(place.getAddress());

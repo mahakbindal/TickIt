@@ -29,11 +29,11 @@ public class WaypointView extends LinearLayout {
         mWaypoint.setText(text);
     }
 
-    public void setOnClickListenerToRemove(OnClickListener onClickListener){
+    public void setOnRemoveListener(OnClickListener onClickListener){
         mRemove.setOnClickListener(onClickListener);
     }
 
-    public void setOnClickListenerToAutocomplete(OnClickListener onClickListener){
+    public void setOnAutocompleteListener(OnClickListener onClickListener){
         mWaypoint.setOnClickListener(onClickListener);
     }
 }

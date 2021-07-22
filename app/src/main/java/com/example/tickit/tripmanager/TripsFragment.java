@@ -60,7 +60,7 @@ public class TripsFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                fetchTimelineAsync(0);
+                fetchTimelineAsync();
             }
         });
         // Configure the refreshing colors
@@ -79,7 +79,7 @@ public class TripsFragment extends Fragment {
         queryTrips();
     }
 
-    private void fetchTimelineAsync(int page) {
+    private void fetchTimelineAsync() {
         mAdapter.clear();
         queryTrips();
         mBinding.swipeContainer.setRefreshing(false);
@@ -93,9 +93,9 @@ public class TripsFragment extends Fragment {
 
         query.findInBackground(new FindCallback<Trip>() {
             @Override
-            public void done(List<Trip> trips, ParseException e) {
-                if(e != null) {
-                    Log.e(TAG, "Issue with getting trips", e);
+            public void done(List<Trip> trips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting trips", exception);
                     return;
                 }
 

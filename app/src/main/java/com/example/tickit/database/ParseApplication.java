@@ -9,6 +9,10 @@ import com.parse.ParseObject;
 
 public class ParseApplication extends Application {
 
+    public static final String APP_ID = "EMq6eQfbMn45qY9a71QbhnCpXCTDT82FEHtAnmZm";
+    public static final String CLIENT_KEY = "5c3Ftxz2lOevOPsi1bT5c9X6ORUHPKnoz43NNxaY";
+    public static final String SERVER = "https://parseapi.back4app.com";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -18,9 +22,9 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(TripDetails.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("EMq6eQfbMn45qY9a71QbhnCpXCTDT82FEHtAnmZm")
-                .clientKey("5c3Ftxz2lOevOPsi1bT5c9X6ORUHPKnoz43NNxaY")
-                .server("https://parseapi.back4app.com")
+                .applicationId(APP_ID)
+                .clientKey(CLIENT_KEY)
+                .server(SERVER)
                 .build()
         );
     }

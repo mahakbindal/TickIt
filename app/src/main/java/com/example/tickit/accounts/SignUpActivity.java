@@ -48,12 +48,12 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                signUpUser(username, password);
+                signUpAndGoToMainActivity(username, password);
             }
         });
     }
 
-    private void signUpUser(String username, String password) {
+    private void signUpAndGoToMainActivity(String username, String password) {
         ParseUser user = new ParseUser();
         user.setUsername(username);
         user.setPassword(password);

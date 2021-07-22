@@ -73,7 +73,7 @@ public class GoogleMapRouteHelper {
 //            drawPolyline();
         }
 
-        calculateDirections(mLatLngList, markerTitleList);
+        showRoute(mLatLngList, markerTitleList);
     }
 
     /* Adds markers to the map based on the latitude and longitude of each location. */
@@ -102,7 +102,7 @@ public class GoogleMapRouteHelper {
     /* Calculates the route between a minimum of two locations (origin and destination), and includes
      * routes for waypoints, if any. Once route is retrieved, calls method to draw route on map.
      * Also calls methods for adding markers, and shifting camera to appropriate view. */
-    public void calculateDirections(List<LatLng> latLngList, List<String> markerTitleList){
+    public void showRoute(List<LatLng> latLngList, List<String> markerTitleList){
         addMarkers(markerTitleList, latLngList);
         goToLocation();
         List<com.google.maps.model.LatLng> convertedLatLngList = convertCoordType(latLngList);
