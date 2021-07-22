@@ -2,6 +2,7 @@ package com.example.tickit.database;
 
 import android.app.Application;
 
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
 import com.example.tickit.models.TripDetails;
 import com.parse.Parse;
@@ -20,6 +21,7 @@ public class ParseApplication extends Application {
         // Register Parse models
         ParseObject.registerSubclass(Trip.class);
         ParseObject.registerSubclass(TripDetails.class);
+        ParseObject.registerSubclass(SavedTrips.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(APP_ID)
