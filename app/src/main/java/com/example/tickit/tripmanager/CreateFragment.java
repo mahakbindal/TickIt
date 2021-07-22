@@ -129,7 +129,7 @@ public class CreateFragment extends Fragment {
 
     }
 
-    public void onRouteClickListener() {
+    private void onRouteClickListener() {
         mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,7 +144,7 @@ public class CreateFragment extends Fragment {
         });
     }
 
-    public void onAddClickListener() {
+    private void onAddClickListener() {
         mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,7 +153,7 @@ public class CreateFragment extends Fragment {
         });
     }
 
-    public void onCreateClickListener() {
+    private void onCreateClickListener() {
         mBinding.btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +164,7 @@ public class CreateFragment extends Fragment {
         });
     }
 
-    public void onSelectImageClickListener() {
+    private void onSelectImageClickListener() {
         mBinding.btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

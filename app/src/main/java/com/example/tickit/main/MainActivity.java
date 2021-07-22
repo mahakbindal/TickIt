@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_create:
                         fragment = new CreateFragment();
+
                         Toast.makeText(MainActivity.this, R.string.createTrip, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_explore:

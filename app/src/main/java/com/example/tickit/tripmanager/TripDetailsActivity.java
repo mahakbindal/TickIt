@@ -58,7 +58,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         mLatLngList = new ArrayList<>();
 
         Intent intent = getIntent();
-        mTrip = Parcels.unwrap(intent.getParcelableExtra(TripsAdapter.TRIP_EXTRA));
+        mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP_EXTRA));
 //        TripsAdapter.newIntentForTripData(mTrip)
 
         // Initialize map fragment
@@ -84,6 +84,12 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         mBinding.tvTripTitle.setText(mTrip.getTitle());
 
+    }
+
+    public static Intent newIntent(Context context, Trip trip) {
+        Intent intent = new Intent(context, TripDetailsActivity.class);
+        intent.putExtra(TRIP_EXTRA, Parcels.wrap(trip));
+        return intent;
     }
 
     @Override

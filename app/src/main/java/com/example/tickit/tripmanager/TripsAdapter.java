@@ -48,26 +48,13 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     @NonNull
     @Override
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip, parent, false);
-//        return new ViewHolder(itemView, mContext);
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
-//        onTripClicked(viewHolder);
-        onTripDoubledClicked(viewHolder);
-//        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-//                Intent intent = new Intent(mContext, TripDetailsActivity.class);
-//                intent.putExtra(TRIP_EXTRA, Parcels.wrap(trip));
-//                mContext.startActivity(intent);
-//                mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
-//            }
-//        });
+        onTripClicked(viewHolder);
         return viewHolder;
     }
 
-    private void onTripDoubledClicked(ViewHolder viewHolder) {
+    private void onTripClicked(ViewHolder viewHolder) {
         viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
             GestureDetector gestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener(){
                 @Override
@@ -86,7 +73,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                    newIntentForTripData(trip);
+                    mContext.startActivity(TripDetailsActivity.newIntent(mContext, trip));
                     mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
                     return super.onSingleTapConfirmed(e);
                 }
@@ -112,23 +99,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         });
     }
 
-    private void onTripClicked(ViewHolder viewHolder) {
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                newIntentForTripData(trip);
-                mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
-            }
-        });
-    }
 
-    public static Intent newIntentForTripData(Trip trip) {
-        Intent intent = new Intent(mContext, TripDetailsActivity.class);
-        intent.putExtra(TRIP_EXTRA, Parcels.wrap(trip));
-        mContext.startActivity(intent);
-        return intent;
-    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
