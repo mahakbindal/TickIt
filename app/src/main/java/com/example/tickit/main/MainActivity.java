@@ -16,6 +16,7 @@ import com.example.tickit.R;
 import com.example.tickit.accounts.LoginActivity;
 import com.example.tickit.databinding.ActivityMainBinding;
 import com.example.tickit.tripmanager.CreateFragment;
+import com.example.tickit.tripmanager.ExploreTripsFragment;
 import com.example.tickit.tripmanager.TripsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
@@ -41,9 +42,13 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_create:
-                    default:
                         fragment = new CreateFragment();
                         Toast.makeText(MainActivity.this, R.string.createTrip, Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_explore:
+                    default:
+                        fragment = new ExploreTripsFragment();
+                        Toast.makeText(MainActivity.this, R.string.exploreTrip, Toast.LENGTH_SHORT).show();
                         break;
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();

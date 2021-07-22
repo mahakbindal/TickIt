@@ -23,7 +23,7 @@ import java.util.List;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
-    public static final String TRIP = "trip";
+    public static final String TRIP_EXTRA = "trip";
     static Context mContext;
     private List<Trip> mTrips;
     private Activity mActivity;
@@ -41,17 +41,36 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 //        return new ViewHolder(itemView, mContext);
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
+        onTripClicked(viewHolder);
+//        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Trip trip = mTrips.get(viewHolder.getAdapterPosition());
+//                Intent intent = new Intent(mContext, TripDetailsActivity.class);
+//                intent.putExtra(TRIP_EXTRA, Parcels.wrap(trip));
+//                mContext.startActivity(intent);
+//                mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+//            }
+//        });
+        return viewHolder;
+    }
+
+    private void onTripClicked(ViewHolder viewHolder) {
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                Intent intent = new Intent(mContext, TripDetailsActivity.class);
-                intent.putExtra(TRIP, Parcels.wrap(trip));
-                mContext.startActivity(intent);
+                newIntentForTripData(trip);
                 mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
         });
-        return viewHolder;
+    }
+
+    public static Intent newIntentForTripData(Trip trip) {
+        Intent intent = new Intent(mContext, TripDetailsActivity.class);
+        intent.putExtra(TRIP_EXTRA, Parcels.wrap(trip));
+        mContext.startActivity(intent);
+        return intent;
     }
 
     @Override

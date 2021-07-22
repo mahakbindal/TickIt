@@ -58,7 +58,8 @@ public class TripDetailsActivity extends AppCompatActivity {
         mLatLngList = new ArrayList<>();
 
         Intent intent = getIntent();
-        mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP_EXTRA));
+        mTrip = Parcels.unwrap(intent.getParcelableExtra(TripsAdapter.TRIP_EXTRA));
+//        TripsAdapter.newIntentForTripData(mTrip)
 
         // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

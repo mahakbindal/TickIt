@@ -12,4 +12,9 @@
         android:icon="@android:drawable/ic_dialog_map"
         android:title="New Trip"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_explore"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="Explore"
+        app:showAsAction="always" />
 </menu>
