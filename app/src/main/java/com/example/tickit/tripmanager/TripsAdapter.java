@@ -3,19 +3,29 @@ package com.example.tickit.tripmanager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tickit.R;
+import com.example.tickit.main.MainActivity;
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
@@ -23,6 +33,7 @@ import java.util.List;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
+    public static final String TAG = "TripsAdapter";
     public static final String TRIP_EXTRA = "trip";
     static Context mContext;
     private List<Trip> mTrips;
@@ -41,7 +52,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 //        return new ViewHolder(itemView, mContext);
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
-        onTripClicked(viewHolder);
+//        onTripClicked(viewHolder);
+        onTripDoubledClicked(viewHolder);
 //        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -53,6 +65,51 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 //            }
 //        });
         return viewHolder;
+    }
+
+    private void onTripDoubledClicked(ViewHolder viewHolder) {
+        viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            GestureDetector gestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    Trip trip = mTrips.get(viewHolder.getAdapterPosition());
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId()))) {
+                        Log.i(TAG, "Trip user: " + trip.getUser());
+                        Log.i(TAG, "Current user: " + ParseUser.getCurrentUser());
+                        saveSavedTrip(trip);
+                        Toast.makeText(mContext, "Doubled tapped", Toast.LENGTH_SHORT).show();
+                    }
+
+                    return super.onDoubleTap(e);
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    Trip trip = mTrips.get(viewHolder.getAdapterPosition());
+                    newIntentForTripData(trip);
+                    mActivity.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                    return super.onSingleTapConfirmed(e);
+                }
+            });
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+                return false;
+            }
+        });
+    }
+
+    private void saveSavedTrip(Trip trip) {
+        SavedTrips savedTrips = new SavedTrips();
+        savedTrips.setTrip(trip);
+        savedTrips.setUser(ParseUser.getCurrentUser());
+
+        savedTrips.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Toast.makeText(mContext, "Trip Saved!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onTripClicked(ViewHolder viewHolder) {
