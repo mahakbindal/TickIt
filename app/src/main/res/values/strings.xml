@@ -17,4 +17,5 @@
     <string name="myTrips">My Trips</string>
     <string name="createTrip">Create Trip</string>
     <string name="exploreTrip">Explore Trips</string>
+    <string name="saveSuccess">Trip Saved!</string>
 </resources>

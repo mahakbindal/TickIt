@@ -107,7 +107,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         savedTrips.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                Toast.makeText(mContext, "Trip Saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.saveSuccess, Toast.LENGTH_SHORT).show();
             }
         });
     }

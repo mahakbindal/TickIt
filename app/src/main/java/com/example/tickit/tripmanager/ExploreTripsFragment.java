@@ -32,6 +32,7 @@ import java.util.List;
 public class ExploreTripsFragment extends Fragment {
 
     public static final String TAG = "ExploreTripsFragment";
+    public static final int GRID_COUNT = 2;
 
     private FragmentExploreTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -63,7 +64,7 @@ public class ExploreTripsFragment extends Fragment {
         mBinding.rvFeatured.setLayoutManager(linearLayoutManager);
 
         mExploreAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity());
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvExploreTrips.setAdapter(mExploreAdapter);
         mBinding.rvExploreTrips.setLayoutManager(gridLayoutManager);
 

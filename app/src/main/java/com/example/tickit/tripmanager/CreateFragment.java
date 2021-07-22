@@ -122,6 +122,14 @@ public class CreateFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        onRouteClickListener();
+        onAddClickListener();
+        onCreateClickListener();
+        onSelectImageClickListener();
+
+    }
+
+    public void onRouteClickListener() {
         mBinding.btnRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,14 +142,18 @@ public class CreateFragment extends Fragment {
                 }
             }
         });
+    }
 
+    public void onAddClickListener() {
         mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addWaypointView();
             }
         });
+    }
 
+    public void onCreateClickListener() {
         mBinding.btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,14 +162,15 @@ public class CreateFragment extends Fragment {
                 saveTrip(currentUser, title);
             }
         });
+    }
 
+    public void onSelectImageClickListener() {
         mBinding.btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onPickPhoto();
             }
         });
-
     }
 
     /* Adds additional waypoints when user clicks the "Add" button */
