@@ -74,7 +74,6 @@ public class CreateFragment extends Fragment {
     private ParseFile mPhotoFile;
     private GoogleMapRouteHelper mGoogleMapRouteHelper;
     private List<String> mRawLocationList;
-    private Context mContext;
     public PostTransitionCallback mPostTransitionCallback;
 
     public CreateFragment() {
@@ -87,7 +86,6 @@ public class CreateFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Initialize view
         mBinding = FragmentCreateBinding.inflate(inflater, container, false);
-        mContext = getContext();
 
         // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
@@ -122,12 +120,10 @@ public class CreateFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         onRouteClickListener();
         onAddClickListener();
         onCreateClickListener();
         onSelectImageClickListener();
-
     }
 
     private void onRouteClickListener() {
@@ -186,7 +182,6 @@ public class CreateFragment extends Fragment {
                         mWaypointsList.remove(waypointView);
                         mBinding.layoutList.removeView(waypointView);
                     }
-
                 }
             });
             mWaypointsList.add(newWaypoint);
@@ -202,9 +197,7 @@ public class CreateFragment extends Fragment {
                 }
             });
         }
-
     }
-
 
     /* Retrieves user input/location from each waypoint views, and converts input into a valid
     Address. Populates mLocations with the Address list. */

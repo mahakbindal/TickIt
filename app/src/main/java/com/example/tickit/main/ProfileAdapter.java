@@ -30,11 +30,9 @@ public class ProfileAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 TripsFragment tripsFragment = new TripsFragment();
-                Toast.makeText(mContext, "Trips Fragment", Toast.LENGTH_SHORT).show();
                 return tripsFragment;
             case 1:
                 SavedTripsFragment savedTripsFragment = new SavedTripsFragment();
-                Toast.makeText(mContext, "Saved Trips Fragment", Toast.LENGTH_SHORT).show();
                 return savedTripsFragment;
             default:
                 return null;

@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentExploreTripsBinding;
@@ -39,6 +41,7 @@ public class ExploreTripsFragment extends Fragment {
     private FragmentExploreTripsBinding mBinding;
     protected List<Trip> mAllTrips;
     List<Trip> mFeaturedTrips;
+    List<Trip> mFilteredTrips;
     TripsAdapter mFeaturedAdapter;
     TripsAdapter mExploreAdapter;
 
@@ -80,8 +83,39 @@ public class ExploreTripsFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_search, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return true;
+            }
+        });
+    }
+
+    private void filter(String query) {
+        mFilteredTrips = new ArrayList<>();
+        for(Trip trip : mAllTrips) {
+            String tripTitle = trip.getTitle().toLowerCase();
+            if(tripTitle.contains(query.toLowerCase())) {
+                mFilteredTrips.add(trip);
+            }
+        }
+        mExploreAdapter.filterList(mFilteredTrips);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     private void populateFeaturedTrips() {

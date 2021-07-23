@@ -99,8 +99,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         });
     }
 
-
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = (Trip) mTrips.get(position);
@@ -128,6 +126,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     // Add a list of items -- change to type used
     public void addAll(List<Trip> list) {
         mTrips.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    public void filterList(List<Trip> filteredTrips) {
+        mTrips = filteredTrips;
         notifyDataSetChanged();
     }
 

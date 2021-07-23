@@ -20,10 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ProfileFragment extends Fragment {
 
-    public static final String TAG = "ProfileFragment";
-
-//    private FragmentProfileBinding mBinding;
-
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -32,7 +28,6 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-//        mBinding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         return view;
     }
