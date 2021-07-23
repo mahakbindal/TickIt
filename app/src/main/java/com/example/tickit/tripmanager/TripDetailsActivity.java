@@ -73,7 +73,9 @@ public class TripDetailsActivity extends AppCompatActivity {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
-                mGoogleMap = googleMap;
+                if(mGoogleMap == null) {
+                    mGoogleMap = googleMap;
+                }
                 UiSettings uiSettings = mGoogleMap.getUiSettings();
                 uiSettings.setZoomControlsEnabled(true);
                 mRouteHelper = new GoogleMapRouteHelper(TripDetailsActivity.this, mGoogleMap, mGeoApiContext);

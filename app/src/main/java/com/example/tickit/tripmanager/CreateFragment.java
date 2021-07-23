@@ -95,7 +95,9 @@ public class CreateFragment extends Fragment {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
-                mGoogleMap = googleMap;
+                if(mGoogleMap == null) {
+                    mGoogleMap = googleMap;
+                }
                 UiSettings uiSettings = mGoogleMap.getUiSettings();
                 uiSettings.setZoomControlsEnabled(true);
             }
@@ -211,6 +213,10 @@ public class CreateFragment extends Fragment {
 
     /* Initializes MapRoute object and begins the call to calculate the route between locations. */
     public void getRoute() throws IOException {
+        if(mGoogleMap == null) {
+            Toast.makeText(getContext(), R.string.nullMap, Toast.LENGTH_SHORT).show();
+            return;
+        }
         mGoogleMapRouteHelper = new GoogleMapRouteHelper(getContext(), mGoogleMap, mGeoApiContext);
         mGoogleMapRouteHelper.geoLocate(mRawLocationList);
     }

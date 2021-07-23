@@ -18,4 +18,5 @@
     <string name="createTrip">Create Trip</string>
     <string name="exploreTrip">Explore Trips</string>
     <string name="saveSuccess">Trip Saved!</string>
+    <string name="nullMap">Google Map is not initialized</string>
 </resources>
