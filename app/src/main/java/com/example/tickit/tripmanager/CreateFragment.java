@@ -75,6 +75,7 @@ public class CreateFragment extends Fragment {
     private GoogleMapRouteHelper mGoogleMapRouteHelper;
     private List<String> mRawLocationList;
     private Context mContext;
+    public PostTransitionCallback mPostTransitionCallback;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -325,8 +326,17 @@ public class CreateFragment extends Fragment {
                     return;
                 }
                 Toast.makeText(getContext(), R.string.create_success, Toast.LENGTH_SHORT).show();
-                ((MainActivity)getActivity()).goTripsFragment();
+//                ((MainActivity)getActivity()).goTripsFragment();
+                mPostTransitionCallback.goTripsFragment();
             }
         });
+    }
+
+    public interface PostTransitionCallback {
+        void goTripsFragment();
+    }
+
+    public void setPostTransitionCallback(PostTransitionCallback postTransitionCallback) {
+        this.mPostTransitionCallback = postTransitionCallback;
     }
 }

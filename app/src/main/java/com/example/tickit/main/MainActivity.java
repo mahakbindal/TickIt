@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import com.parse.ParseUser;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding mBinding;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = mBinding.getRoot();
         setContentView(view);
+        mContext = this;
 
         mBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -43,7 +46,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_create:
                         fragment = new CreateFragment();
-
+                        ((CreateFragment) fragment).setPostTransitionCallback(new CreateFragment.PostTransitionCallback() {
+                            @Override
+                            public void goTripsFragment() {
+                                getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, new TripsFragment()).commit();
+                                mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
+                            }
+                        });
                         Toast.makeText(MainActivity.this, R.string.createTrip, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_explore:
@@ -80,12 +89,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
         finish();
         return true;
-    }
-
-    /* When the create button is clicked in CreateFragment and data is saved in Parse, go to
-    * TripsFragment. */
-    public void goTripsFragment(){
-        getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, new TripsFragment()).commit();
-        mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
     }
 }

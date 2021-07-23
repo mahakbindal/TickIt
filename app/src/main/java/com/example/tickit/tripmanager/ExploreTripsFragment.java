@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -45,6 +47,12 @@ public class ExploreTripsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -68,6 +76,12 @@ public class ExploreTripsFragment extends Fragment {
         mBinding.rvExploreTrips.setAdapter(mExploreAdapter);
         mBinding.rvExploreTrips.setLayoutManager(gridLayoutManager);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_search, menu);
     }
 
     private void populateFeaturedTrips() {
