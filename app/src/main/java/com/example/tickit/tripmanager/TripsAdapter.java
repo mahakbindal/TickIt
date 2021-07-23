@@ -103,9 +103,13 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Trip trip = mTrips.get(position);
+        Trip trip = (Trip) mTrips.get(position);
         holder.mRootView.setTag(trip);
-        holder.mTvTripName.setText(trip.getTitle());
+        try {
+            holder.mTvTripName.setText(trip.fetchIfNeeded().getString("title"));
+        } catch (ParseException exception) {
+            exception.printStackTrace();
+        }
         ParseFile image = trip.getImage();
         Glide.with(mContext).load(image.getUrl()).into(holder.mIvTripPic);
     }

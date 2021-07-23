@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_trips:
-                        fragment = new TripsFragment();
+                        fragment = new ProfileFragment();
                         Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_create:

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
@@ -29,6 +30,7 @@ import java.util.List;
 public class SavedTripsFragment extends Fragment {
 
     public static final String TAG = "SavedTripsFragment";
+    private static final int GRID_COUNT = 2;
 
     private FragmentSavedTripsBinding mBinding;
     private List<Trip> mSavedTrips;
@@ -53,9 +55,12 @@ public class SavedTripsFragment extends Fragment {
         querySavedTrips();
 
         mAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        mBinding.rvSaved.setLayoutManager(linearLayoutManager);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+//        mBinding.rvSaved.setLayoutManager(linearLayoutManager);
+//        mBinding.rvSaved.setAdapter(mAdapter);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvSaved.setAdapter(mAdapter);
+        mBinding.rvSaved.setLayoutManager(gridLayoutManager);
     }
 
     private void querySavedTrips() {
@@ -74,6 +79,7 @@ public class SavedTripsFragment extends Fragment {
                 for(SavedTrips trip : savedTrips) {
                     mSavedTrips.add((Trip) trip.getTrip());
                 }
+                Log.i(TAG, "Saved trips: " + mSavedTrips);
                 mAdapter.notifyDataSetChanged();
             }
         });
