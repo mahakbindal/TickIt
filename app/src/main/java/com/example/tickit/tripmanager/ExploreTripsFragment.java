@@ -148,7 +148,7 @@ public class ExploreTripsFragment extends Fragment {
     private void populateFeaturedTrips() {
         for(int i = 0; i < FEATURED_TRIPS_LIMIT; i++) {
             int tripIndex = (int)(Math.random() * mAllTrips.size());
-            mFeaturedTrips.add(mAllTrips.remove(tripIndex));
+            mFeaturedTrips.add(mAllTrips.get(tripIndex));
         }
     }
 

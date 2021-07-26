@@ -39,7 +39,7 @@ public class ProfileFragment extends Fragment {
         TabLayout tabLayout = getView().findViewById(R.id.tabLayout);
         ViewPager viewPager = getView().findViewById(R.id.viewPager);
 
-        ProfileAdapter profileAdapter = new ProfileAdapter(getChildFragmentManager(), tabLayout.getTabCount(), getContext());
+        ProfileAdapter profileAdapter = new ProfileAdapter(getChildFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(profileAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

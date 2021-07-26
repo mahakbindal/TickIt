@@ -16,12 +16,10 @@ import com.example.tickit.tripmanager.TripsFragment;
 public class ProfileAdapter extends FragmentPagerAdapter {
 
     private int mNumTabs;
-    private Context mContext;
 
-    public ProfileAdapter(@NonNull FragmentManager fm, int numTabs, Context context) {
+    public ProfileAdapter(@NonNull FragmentManager fm, int numTabs) {
         super(fm);
         this.mNumTabs = numTabs;
-        this.mContext = context;
     }
 
     @NonNull

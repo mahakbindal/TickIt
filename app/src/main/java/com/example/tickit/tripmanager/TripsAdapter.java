@@ -21,14 +21,17 @@ import com.example.tickit.R;
 import com.example.tickit.main.MainActivity;
 import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
@@ -38,17 +41,20 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     static Context mContext;
     private List<Trip> mTrips;
     private Activity mActivity;
+    private List<String> mSavedTrips;
 
     public TripsAdapter(Context context, List<Trip> mTrips, Activity activity) {
         this.mContext = context;
         this.mTrips = mTrips;
         this.mActivity = activity;
+        mSavedTrips = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
+        querySavedTrips();
         ViewHolder viewHolder = new ViewHolder(view);
         onTripClicked(viewHolder);
         return viewHolder;
@@ -60,9 +66,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId()))) {
-                        Log.i(TAG, "Trip user: " + trip.getUser());
-                        Log.i(TAG, "Current user: " + ParseUser.getCurrentUser());
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mSavedTrips.contains(trip.getObjectId())) {
                         saveSavedTrip(trip);
                     }
 
@@ -94,6 +98,23 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
             @Override
             public void done(ParseException e) {
                 Toast.makeText(mContext, R.string.saveSuccess, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void querySavedTrips() {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        query.include(Trip.KEY_USER);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<SavedTrips>() {
+            @Override
+            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting saved trips", exception);
+                }
+                for(SavedTrips trip : savedTrips) {
+                    mSavedTrips.add(trip.getTrip().getObjectId());
+                }
             }
         });
     }
