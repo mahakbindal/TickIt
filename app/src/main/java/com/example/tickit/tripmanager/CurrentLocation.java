@@ -46,7 +46,7 @@ public class CurrentLocation {
     public List<Trip> mNearbyTrips;
     private double mLatitude;
     private double mLongitude;
-    private boolean mLocationChangedCheck = false;
+    private LocationListenerCallback mLocationListenerCallback;
 
     public CurrentLocation(Context context) {
         mLocationListener = new MyLocationListener();
@@ -127,9 +127,6 @@ public class CurrentLocation {
         return(c * r);
     }
 
-    public boolean getLocationChangedCheck(){
-        return mLocationChangedCheck;
-    }
     class MyLocationListener implements LocationListener {
 
         @Override
@@ -139,17 +136,7 @@ public class CurrentLocation {
                 mLocationManager.removeUpdates(mLocationListener);
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
-
-                mLocationChangedCheck = true;
-                Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-                List<Address> myAddress = new ArrayList<>();
-                try {
-                   myAddress = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String address = myAddress.get(0).getAddressLine(0);
-                Log.i(TAG, "My current location: " + address);
+                mLocationListenerCallback.locationChanged();
             }
         }
 
@@ -167,5 +154,13 @@ public class CurrentLocation {
         public void onProviderDisabled(@NonNull String provider) {
 
         }
+    }
+
+    public interface LocationListenerCallback {
+        void locationChanged();
+    }
+
+    public void setLocationListenerCallback(LocationListenerCallback locationListenerCallback) {
+        this.mLocationListenerCallback = locationListenerCallback;
     }
 }

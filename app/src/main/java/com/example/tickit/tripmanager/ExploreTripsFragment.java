@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 
 import com.example.tickit.R;
@@ -47,7 +48,6 @@ public class ExploreTripsFragment extends Fragment {
     public static final int FEATURED_TRIPS_LIMIT = 5;
     public static final int GRID_COUNT = 2;
     public static final int DISTANCE_LIMIT = 500;
-    public static final int GET_DISTANCE_DELAY = 100;
 
     private FragmentExploreTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -188,19 +188,11 @@ public class ExploreTripsFragment extends Fragment {
                 }
                 mLocationDetails.addAll(tripDetails);
                 mNearbyAdapter.notifyDataSetChanged();
-
-                android.os.Handler handler = new android.os.Handler();
-                handler.post(new Runnable() {
+                mBinding.pbLoading.setVisibility(ProgressBar.VISIBLE);
+                mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
                     @Override
-                    public void run() {
-                        if(!mCurrentLocation.getLocationChangedCheck()){
-                                Log.d(TAG, "CurrentLocation not initialized");
-                                handler.postDelayed(this, GET_DISTANCE_DELAY);
-                        }
-                        else{
-                            Log.d(TAG, "CurrentLocation initialized! Calling filterTripDetails()");
-                            filterTripDetails();
-                        }
+                    public void locationChanged() {
+                        filterTripDetails();
                     }
                 });
             }
@@ -220,6 +212,8 @@ public class ExploreTripsFragment extends Fragment {
             }
         }
         Log.i(TAG, "Nearby Trips" + mNearbyTrips);
+        mBinding.exploreLayout.removeView(mBinding.pbLoading);
+        mBinding.pbLoading.setVisibility(ProgressBar.INVISIBLE);
         mNearbyAdapter.notifyDataSetChanged();
     }
 }
