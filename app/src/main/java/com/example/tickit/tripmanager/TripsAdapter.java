@@ -34,7 +34,7 @@ import java.util.List;
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
     public static final String TAG = "TripsAdapter";
-    public static final String TRIP_EXTRA = "trip";
+    public static final String TRIP_TITLE = "title";
     static Context mContext;
     private List<Trip> mTrips;
     private Activity mActivity;
@@ -64,7 +64,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                         Log.i(TAG, "Trip user: " + trip.getUser());
                         Log.i(TAG, "Current user: " + ParseUser.getCurrentUser());
                         saveSavedTrip(trip);
-                        Toast.makeText(mContext, "Doubled tapped", Toast.LENGTH_SHORT).show();
                     }
 
                     return super.onDoubleTap(e);
@@ -104,7 +103,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         Trip trip = (Trip) mTrips.get(position);
         holder.mRootView.setTag(trip);
         try {
-            holder.mTvTripName.setText(trip.fetchIfNeeded().getString("title"));
+            holder.mTvTripName.setText(trip.fetchIfNeeded().getString(TRIP_TITLE));
         } catch (ParseException exception) {
             exception.printStackTrace();
         }
