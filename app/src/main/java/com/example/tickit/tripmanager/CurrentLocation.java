@@ -136,7 +136,9 @@ public class CurrentLocation {
                 mLocationManager.removeUpdates(mLocationListener);
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
-                mLocationListenerCallback.locationChanged();
+                if(mLocationListenerCallback != null) {
+                    mLocationListenerCallback.locationChanged();
+                }
             }
         }
 

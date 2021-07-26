@@ -1,89 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tripmanager.ExploreTripsFragment">
+    tools:context=".main.ProfileFragment">
 
-    <LinearLayout
-        android:id="@+id/exploreLayout"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutExplore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/discover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discover" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/allTrips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Trips" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPagerExplore"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:background="@android:color/white"
+        android:layout_below="@id/tabLayoutExplore" />
 
-        <TextView
-            android:id="@+id/tvFeatured"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:text="Featured Trips"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-
-        <View
-            android:id="@+id/line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tvFeatured"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="-3dp"
-            android:layout_marginTop="5dp"
-            android:background="#c0c0c0" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvFeatured"
-            android:layout_width="match_parent"
-            android:layout_height="255dp"
-            android:paddingBottom="30dp"
-            android:layout_below="@+id/line"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal" />
-
-        <TextView
-            android:id="@+id/tvNearbyTrips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:text="Trips Near You"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-
-        <View
-            android:id="@+id/line1"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tvFeatured"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="-3dp"
-            android:layout_marginTop="5dp"
-            android:background="#c0c0c0" />
-
-        <ProgressBar
-            android:id="@+id/pbLoading"
-            android:layout_gravity="center_horizontal"
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvNearbyTrips"
-            android:layout_width="match_parent"
-            android:layout_height="255dp"
-            android:paddingBottom="30dp"
-            android:layout_below="@+id/line"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvExploreTrips"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/rvFeatured" />
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>

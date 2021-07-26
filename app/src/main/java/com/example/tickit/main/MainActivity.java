@@ -3,9 +3,7 @@ package com.example.tickit.main;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,7 +15,7 @@ import com.example.tickit.R;
 import com.example.tickit.accounts.LoginActivity;
 import com.example.tickit.databinding.ActivityMainBinding;
 import com.example.tickit.tripmanager.CreateFragment;
-import com.example.tickit.tripmanager.ExploreTripsFragment;
+import com.example.tickit.tripmanager.FeaturedTripsFragment;
 import com.example.tickit.tripmanager.TripsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
