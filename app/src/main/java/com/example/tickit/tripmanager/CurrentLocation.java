@@ -107,6 +107,11 @@ public class CurrentLocation {
         return true;
     }
 
+    public ParseGeoPoint getCurrentLocation() {
+        ParseGeoPoint geoPoint = new ParseGeoPoint(mLatitude, mLongitude);
+        return geoPoint;
+    }
+
     public double distance(LatLng coordinates)
     {
         double lon1 = Math.toRadians(mLongitude);

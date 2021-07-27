@@ -3,18 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_trips"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Trips"
+        android:id="@+id/action_explore"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="Explore"
         app:showAsAction="always" />
+
     <item
         android:id="@+id/action_create"
         android:icon="@android:drawable/ic_dialog_map"
         android:title="New Trip"
         app:showAsAction="always" />
+
     <item
-        android:id="@+id/action_explore"
-        android:icon="@android:drawable/ic_menu_mapmode"
-        android:title="Explore"
+        android:id="@+id/action_trips"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="My Trips"
         app:showAsAction="always" />
+
 </menu>

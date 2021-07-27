@@ -23,6 +23,7 @@ import android.widget.SearchView;
 
 import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentFeaturedTripsBinding;
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
 import com.example.tickit.models.TripDetails;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +36,8 @@ import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -44,16 +47,17 @@ import java.util.concurrent.CountDownLatch;
  */
 public class FeaturedTripsFragment extends Fragment {
 
-    public static final String TAG = "ExploreTripsFragment";
+    public static final String TAG = "FeaturedTripsFragment";
     public static final int FEATURED_TRIPS_LIMIT = 5;
     public static final int DISTANCE_LIMIT = 500;
 
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
     private List<String> mAllTripsIds;
+    HashMap<String, Integer> mSavedTripsTracker = new HashMap<>();
     List<Trip> mFeaturedTrips;
     List<Trip> mNearbyTrips;
-    List<TripDetails> mLocationDetails;
+    List<TripDetails> mTripDetails;
     TripsAdapter mFeaturedAdapter;
     TripsAdapter mNearbyAdapter;
     CurrentLocation mCurrentLocation;
@@ -78,16 +82,17 @@ public class FeaturedTripsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
         mCurrentLocation = new CurrentLocation(getContext());
         mCurrentLocation.getLocation();
         mAllTrips = new ArrayList<>();
         mFeaturedTrips = new ArrayList<>();
         mNearbyTrips = new ArrayList<>();
-        mLocationDetails = new ArrayList<>();
+        mTripDetails = new ArrayList<>();
         mAllTripsIds = new ArrayList<>();
         queryTrips();
-        queryTripDetails();
+//        queryTripDetails();
 
         mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -98,6 +103,14 @@ public class FeaturedTripsFragment extends Fragment {
         LinearLayoutManager linearLayoutManagerNearby = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvNearbyTrips.setAdapter(mNearbyAdapter);
         mBinding.rvNearbyTrips.setLayoutManager(linearLayoutManagerNearby);
+
+        mBinding.pbLoading.setVisibility(ProgressBar.VISIBLE);
+        mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
+            @Override
+            public void locationChanged() {
+                queryNearbyTrips();
+            }
+        });
     }
 
     @Override
@@ -106,8 +119,8 @@ public class FeaturedTripsFragment extends Fragment {
     }
 
     private void populateFeaturedTrips() {
-        for(int i = 0; i < FEATURED_TRIPS_LIMIT; i++) {
-            int tripIndex = (int)(Math.random() * mAllTrips.size());
+        for (int i = 0; i < FEATURED_TRIPS_LIMIT; i++) {
+            int tripIndex = (int) (Math.random() * mAllTrips.size());
             mFeaturedTrips.add(mAllTrips.get(tripIndex));
         }
     }
@@ -121,13 +134,13 @@ public class FeaturedTripsFragment extends Fragment {
         query.findInBackground(new FindCallback<Trip>() {
             @Override
             public void done(List<Trip> trips, ParseException exception) {
-                if(exception != null) {
+                if (exception != null) {
                     Log.e(TAG, "Issue with getting trips", exception);
                     return;
                 }
-
+                Log.i(TAG, "queryTrips trips: " + trips);
                 mAllTrips.addAll(trips);
-                for(Trip trip : trips) {
+                for (Trip trip : trips) {
                     mAllTripsIds.add(trip.getObjectId());
                 }
                 mFeaturedAdapter.notifyDataSetChanged();
@@ -136,43 +149,51 @@ public class FeaturedTripsFragment extends Fragment {
         });
     }
 
-    private void queryTripDetails() {
-        ParseQuery<TripDetails> query = ParseQuery.getQuery(TripDetails.class);
-        query.findInBackground(new FindCallback<TripDetails>() {
+    private void queryNearbyTrips() {
+        ParseQuery<Trip> tripQuery = ParseQuery.getQuery(Trip.class);
+        tripQuery.include(Trip.KEY_USER);
+        tripQuery.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        ParseGeoPoint geoPoint = mCurrentLocation.getCurrentLocation();
+        tripQuery.findInBackground(new FindCallback<Trip>() {
             @Override
-            public void done(List<TripDetails> tripDetails, ParseException exception) {
-                if(exception != null) {
-                    Log.e(TAG, "Issue with getting trip details", exception);
-                    return;
+            public void done(List<Trip> trips, ParseException e) {
+                Log.i(TAG, "Trip object ids: " + trips);
+                List<String> tripIds = new ArrayList<>();
+                for (Trip trip : trips) {
+                    tripIds.add(trip.getObjectId());
                 }
-                mLocationDetails.addAll(tripDetails);
-                mNearbyAdapter.notifyDataSetChanged();
-                mBinding.pbLoading.setVisibility(ProgressBar.VISIBLE);
-                mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
+                Log.i(TAG, "My trip ids: " + tripIds);
+                ParseQuery<TripDetails> tripDetailsQuery = ParseQuery.getQuery(TripDetails.class);
+                Log.i(TAG, "latitude: " + geoPoint.getLatitude() + " longitude: " + geoPoint.getLongitude());
+                tripDetailsQuery.whereWithinMiles(TripDetails.KEY_LATLNG, geoPoint, DISTANCE_LIMIT);
+                tripDetailsQuery.whereNotEqualTo(TripDetails.KEY_TRIP, ParseUser.getCurrentUser());
+                tripDetailsQuery.whereNotContainedIn(TripDetails.KEY_TRIP, tripIds);
+                tripDetailsQuery.findInBackground(new FindCallback<TripDetails>() {
                     @Override
-                    public void locationChanged() {
+                    public void done(List<TripDetails> tripDetails, ParseException e) {
+                        Log.i(TAG, "Trip details filtered: " + tripDetails);
+                        for (TripDetails trip : tripDetails) {
+                            Log.i(TAG, "Trip details location: " + trip.getLocation() + " obj id: " + trip.getTrip().getObjectId());
+                        }
+                        mTripDetails.addAll(tripDetails);
                         filterTripDetails();
                     }
                 });
             }
         });
     }
-;
+
     private void filterTripDetails() {
-        List<String> tripIds = new ArrayList<>();
-        for(TripDetails tripDetail : mLocationDetails) {
-            ParseGeoPoint geoPoint = tripDetail.getLatLng();
-            LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-            double distanceMiles = mCurrentLocation.distance(latLng);
-            Trip trip = (Trip) tripDetail.getTrip();
-            if (distanceMiles <= DISTANCE_LIMIT && !tripIds.contains(trip.getObjectId()) && mAllTripsIds.contains(trip.getObjectId())) {
-                mNearbyTrips.add(trip);
-                tripIds.add(trip.getObjectId());
+        List<String> tripObjectIds = new ArrayList<>();
+        for(TripDetails tripDetail : mTripDetails) {
+            String tripId = tripDetail.getTrip().getObjectId();
+            if(!tripObjectIds.contains(tripId)) {
+                tripObjectIds.add(tripId);
+                mNearbyTrips.add((Trip)tripDetail.getTrip());
             }
         }
-        Log.i(TAG, "Nearby Trips" + mNearbyTrips);
+        mNearbyAdapter.notifyDataSetChanged();
         mBinding.exploreLayout.removeView(mBinding.pbLoading);
         mBinding.pbLoading.setVisibility(ProgressBar.INVISIBLE);
-        mNearbyAdapter.notifyDataSetChanged();
     }
 }

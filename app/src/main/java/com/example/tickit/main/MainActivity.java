@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
                 switch (item.getItemId()) {
-                    case R.id.action_trips:
-                        fragment = new ProfileFragment();
+                    case R.id.action_explore:
+                        fragment = new ExploreTripsFragment();
                         Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_create:
@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
                         });
                         Toast.makeText(MainActivity.this, R.string.createTrip, Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.action_explore:
+                    case R.id.action_trips:
                     default:
-                        fragment = new ExploreTripsFragment();
+                        fragment = new ProfileFragment();
                         Toast.makeText(MainActivity.this, R.string.exploreTrip, Toast.LENGTH_SHORT).show();
                         break;
                 }
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        mBinding.bottomNavigation.setSelectedItemId(R.id.action_trips);
+        mBinding.bottomNavigation.setSelectedItemId(R.id.action_explore);
     }
 
     @Override
