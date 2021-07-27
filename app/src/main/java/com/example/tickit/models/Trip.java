@@ -11,6 +11,7 @@ public class Trip extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_TITLE = "title";
+    public static final String KEY_SAVE_COUNT = "saveCount";
 
     public ParseUser getUser() {
         return getParseUser(KEY_USER);
@@ -35,4 +36,8 @@ public class Trip extends ParseObject {
     public void setTitle(String title) {
         put(KEY_TITLE, title);
     }
+
+    public int getSaveCount() {return (int) getNumber(KEY_SAVE_COUNT);}
+
+    public void setSaveCount(int saveCount) {put(KEY_SAVE_COUNT, saveCount);}
 }

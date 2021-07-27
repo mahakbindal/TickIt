@@ -96,10 +96,24 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
         savedTrips.saveInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Error saving trip", exception);
+                }
                 Toast.makeText(mContext, R.string.saveSuccess, Toast.LENGTH_SHORT).show();
             }
         });
+
+        trip.setSaveCount(trip.getSaveCount() + 1);
+        trip.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Error saving trip", exception);
+                }
+            }
+        });
+
     }
 
     private void querySavedTrips() {

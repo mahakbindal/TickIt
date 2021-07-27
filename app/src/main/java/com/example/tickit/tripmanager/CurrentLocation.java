@@ -53,7 +53,6 @@ public class CurrentLocation {
         this.mContext = context;
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mNearbyTrips = new ArrayList<>();
-
     }
 
     public void getLocation() {
@@ -110,26 +109,6 @@ public class CurrentLocation {
     public ParseGeoPoint getCurrentLocation() {
         ParseGeoPoint geoPoint = new ParseGeoPoint(mLatitude, mLongitude);
         return geoPoint;
-    }
-
-    public double distance(LatLng coordinates)
-    {
-        double lon1 = Math.toRadians(mLongitude);
-        double lon2 = Math.toRadians(coordinates.longitude);
-        double lat1 = Math.toRadians(mLatitude);
-        double lat2 = Math.toRadians(coordinates.latitude);
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-        // Radius of earth in kilometers. Use 3956
-        // for miles, 6731 kilometers
-        double r = 3956;
-        return(c * r);
     }
 
     class MyLocationListener implements LocationListener {
