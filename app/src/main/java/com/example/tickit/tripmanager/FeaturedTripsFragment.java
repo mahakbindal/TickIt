@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 
 import com.example.tickit.databinding.FragmentFeaturedTripsBinding;
@@ -36,7 +38,7 @@ public class FeaturedTripsFragment extends Fragment {
     public static final String TAG = "FeaturedTripsFragment";
     public static final int FEATURED_TRIPS_LIMIT = 5;
     public static final int SAVED_TRIPS_LIMIT = 5;
-    public static final int DISTANCE_LIMIT = 500;
+    public static final int DISTANCE_LIMIT_DEFAULT = 100;
 
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -80,6 +82,10 @@ public class FeaturedTripsFragment extends Fragment {
         queryTrips();
         querySavedTrips();
 
+        String[] miles = new String[]{"100", "500", "1000", "5000", "10000"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, miles);
+        mBinding.milesDropdown.setAdapter(adapter);
+
         // Set Featured trips recycler view
         mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -96,7 +102,8 @@ public class FeaturedTripsFragment extends Fragment {
         mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
             @Override
             public void locationChanged() {
-                queryNearbyTrips();
+                queryNearbyTrips(DISTANCE_LIMIT_DEFAULT);
+                onFilterClick();
             }
         });
 
@@ -108,10 +115,30 @@ public class FeaturedTripsFragment extends Fragment {
         mBinding.rvMostSaved.setLayoutManager(linearLayoutManagerSaved);
     }
 
+    private void onFilterClick() {
+        mBinding.milesDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int miles = Integer.parseInt(mBinding.milesDropdown.getSelectedItem().toString());
+                queryNearbyTrips(miles);
+                mNearbyAdapter.clear();
+                mNearbyAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
     private void populateFeaturedTrips() {
+        List<Integer> indexList = new ArrayList<>();
         for (int i = 0; i < FEATURED_TRIPS_LIMIT; i++) {
             int tripIndex = (int) (Math.random() * mAllTrips.size());
-            mFeaturedTrips.add(mAllTrips.get(tripIndex));
+            if(!indexList.contains(tripIndex)) {
+                mFeaturedTrips.add(mAllTrips.get(tripIndex));
+                indexList.add(tripIndex);
+            }
         }
     }
 
@@ -135,7 +162,7 @@ public class FeaturedTripsFragment extends Fragment {
         });
     }
 
-    private void queryNearbyTrips() {
+    private void queryNearbyTrips(int miles) {
         ParseQuery<Trip> tripQuery = ParseQuery.getQuery(Trip.class);
         tripQuery.include(Trip.KEY_USER);
         tripQuery.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
@@ -152,7 +179,7 @@ public class FeaturedTripsFragment extends Fragment {
                 }
                 ParseQuery<TripDetails> tripDetailsQuery = ParseQuery.getQuery(TripDetails.class);
                 Log.i(TAG, "latitude: " + geoPoint.getLatitude() + " longitude: " + geoPoint.getLongitude());
-                tripDetailsQuery.whereWithinMiles(TripDetails.KEY_LATLNG, geoPoint, DISTANCE_LIMIT);
+                tripDetailsQuery.whereWithinMiles(TripDetails.KEY_LATLNG, geoPoint, miles);
                 tripDetailsQuery.whereNotEqualTo(TripDetails.KEY_TRIP, ParseUser.getCurrentUser());
                 tripDetailsQuery.whereNotContainedIn(TripDetails.KEY_TRIP, tripIds);
                 tripDetailsQuery.findInBackground(new FindCallback<TripDetails>() {
