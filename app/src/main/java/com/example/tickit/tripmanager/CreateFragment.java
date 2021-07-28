@@ -237,6 +237,7 @@ public class CreateFragment extends Fragment {
                                 String snippet = etSnippet.getText().toString();
                                 locationTitleDesc.put(marker.getTitle(), snippet);
                                 marker.setSnippet(snippet);
+                                marker.showInfoWindow();
                                 etSnippet.setText("");
                             }
                         });
