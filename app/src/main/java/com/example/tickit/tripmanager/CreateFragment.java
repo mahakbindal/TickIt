@@ -13,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -72,6 +74,11 @@ public class CreateFragment extends Fragment {
     public static final int IMG_WIDTH = 200;
     public static final int IMG_QUALITY = 100;
     public static final int AUTOCOMPLETE_CODE = 100;
+    public static final int VERSION = 27;
+    public static final int FLAG = 0;
+    public static final String ALERT_DIALOG_OK = "OK";
+    public static final String ALERT_DIALOG_REMOVE = "REMOVE";
+    public static final String ALERT_DIALOG_CANCEL = "CANCEL";
 
     public String mPhotoFileName = "photo.jpg";
     private FragmentCreateBinding mBinding;
@@ -149,6 +156,8 @@ public class CreateFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(),FLAG);
             }
         });
     }
@@ -229,11 +238,16 @@ public class CreateFragment extends Fragment {
         mGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(@NonNull @NotNull Marker marker) {
-                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                EditText etSnippet = alertDialog.findViewById(R.id.etSnippet);
+                if((marker.getSnippet()) != null) {
+                    etSnippet.setText(marker.getSnippet());
+                }
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, ALERT_DIALOG_OK,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 EditText etSnippet = alertDialog.findViewById(R.id.etSnippet);
+
                                 String snippet = etSnippet.getText().toString();
                                 locationTitleDesc.put(marker.getTitle(), snippet);
                                 if(!snippet.equals("")) {
@@ -243,6 +257,20 @@ public class CreateFragment extends Fragment {
                                 etSnippet.setText("");
                             }
                         });
+                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, ALERT_DIALOG_CANCEL, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, ALERT_DIALOG_REMOVE, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        marker.setSnippet("");
+                        marker.showInfoWindow();
+                    }
+                });
                 alertDialog.show();
             }
         });
@@ -271,7 +299,7 @@ public class CreateFragment extends Fragment {
         Bitmap image = null;
         try {
             // check version of Android on device
-            if(Build.VERSION.SDK_INT > 27){
+            if(Build.VERSION.SDK_INT > VERSION){
                 // on newer versions of Android, use the new decodeBitmap method
                 ImageDecoder.Source source = ImageDecoder.createSource(getContext().getContentResolver(), photoUri);
                 image = ImageDecoder.decodeBitmap(source);
