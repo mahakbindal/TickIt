@@ -1,6 +1,8 @@
 package com.example.tickit.tripmanager;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -32,6 +35,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -44,11 +48,15 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -75,6 +83,7 @@ public class CreateFragment extends Fragment {
     private GoogleMapRouteHelper mGoogleMapRouteHelper;
     private List<String> mRawLocationList;
     public PostTransitionCallback mPostTransitionCallback;
+    private Map<String, String> locationTitleDesc = new HashMap<>();
 
     public CreateFragment() {
         // Required empty public constructor
@@ -136,6 +145,7 @@ public class CreateFragment extends Fragment {
                 try {
                     getWaypointInput();
                     getRoute();
+                    showAlertDialogForMarker();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -209,6 +219,30 @@ public class CreateFragment extends Fragment {
             String loc = mWaypointsList.get(i).getEditTextValue();
             mRawLocationList.add(loc);
         }
+    }
+
+    private void showAlertDialogForMarker() {
+        View descriptionView = LayoutInflater.from(getContext()).inflate(R.layout.location_description_item, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setView(descriptionView);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        mGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull @NotNull Marker marker) {
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                EditText etSnippet = alertDialog.findViewById(R.id.etSnippet);
+                                String snippet = etSnippet.getText().toString();
+                                locationTitleDesc.put(marker.getTitle(), snippet);
+                                marker.setSnippet(snippet);
+                                etSnippet.setText("");
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
     }
 
     /* Initializes MapRoute object and begins the call to calculate the route between locations. */
@@ -299,6 +333,9 @@ public class CreateFragment extends Fragment {
             mWaypointsList.get(i).setEditTextValue("");
             tripDetails.setLocation(locationName);
             tripDetails.setLocationIndex(i);
+            if(locationTitleDesc.containsKey(locationName)) {
+                tripDetails.setDescription(locationTitleDesc.get(locationName));
+            }
 
             Address address = locations.get(i).get(0);
             ParseGeoPoint geoPoint = new ParseGeoPoint(address.getLatitude(), address.getLongitude());

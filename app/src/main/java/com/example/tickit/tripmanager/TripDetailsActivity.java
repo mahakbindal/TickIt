@@ -18,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.GeoApiContext;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -25,10 +26,13 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TripDetailsActivity extends AppCompatActivity {
 
@@ -43,8 +47,7 @@ public class TripDetailsActivity extends AppCompatActivity {
     public Trip mTrip;
     private List<TripDetails> mTripDetails;
     private List<LocationDetailsView> mLocationDetails;
-    private List<LatLng> mLatLngList;
-    private List<String> mMarkerTitle;
+    private Map<String, String> mMarkerTitleDescription = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,6 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         mTripDetails = new ArrayList<>();
         mLocationDetails = new ArrayList<>();
-        mLatLngList = new ArrayList<>();
 
         Intent intent = getIntent();
         mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP_EXTRA));
@@ -119,6 +121,23 @@ public class TripDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void displayMarkerDetails() {
+        Log.i(TAG, "Info window map: " + mMarkerTitleDescription);
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                String description = mMarkerTitleDescription.get(marker.getTitle());
+                if(description != null && !description.equals("")) {
+                    marker.setSnippet(description);
+//                    marker.showInfoWindow();
+                }
+                marker.setTitle(marker.getTitle());
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+    }
+
     private void setTripDetails(List<TripDetails> tripDetails) {
         mTripDetails = tripDetails;
         List<String> waypointNameList = updateWaypointList();
@@ -132,7 +151,9 @@ public class TripDetailsActivity extends AppCompatActivity {
             ParseGeoPoint geoPoint = details.getLatLng();
             LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
             waypointLatLngList.add(latLng);
+            mMarkerTitleDescription.put(details.getLocation(), details.getDescription());
         }
+        displayMarkerDetails();
         return waypointLatLngList;
     }
 
