@@ -236,7 +236,9 @@ public class CreateFragment extends Fragment {
                                 EditText etSnippet = alertDialog.findViewById(R.id.etSnippet);
                                 String snippet = etSnippet.getText().toString();
                                 locationTitleDesc.put(marker.getTitle(), snippet);
-                                marker.setSnippet(snippet);
+                                if(!snippet.equals("")) {
+                                    marker.setSnippet(snippet);
+                                }
                                 marker.showInfoWindow();
                                 etSnippet.setText("");
                             }

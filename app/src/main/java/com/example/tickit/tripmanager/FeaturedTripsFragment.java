@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -39,6 +41,8 @@ public class FeaturedTripsFragment extends Fragment {
     public static final int FEATURED_TRIPS_LIMIT = 5;
     public static final int SAVED_TRIPS_LIMIT = 5;
     public static final int DISTANCE_LIMIT_DEFAULT = 100;
+    public static final String[] MILES = new String[]{"100", "500", "1000", "5000", "10000"};
+    public static final String[] ORDER = new String[]{"Near to Far", "Far to Near"};
 
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -50,6 +54,8 @@ public class FeaturedTripsFragment extends Fragment {
     TripsAdapter mNearbyAdapter;
     TripsAdapter mSavedAdapter;
     CurrentLocation mCurrentLocation;
+    int mMiles = DISTANCE_LIMIT_DEFAULT;
+    boolean mReverse = false;
 
     public FeaturedTripsFragment() {
         // Required empty public constructor
@@ -82,9 +88,12 @@ public class FeaturedTripsFragment extends Fragment {
         queryTrips();
         querySavedTrips();
 
-        String[] miles = new String[]{"100", "500", "1000", "5000", "10000"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, miles);
-        mBinding.milesDropdown.setAdapter(adapter);
+//        String[] miles = new String[]{"100", "500", "1000", "5000", "10000"};
+//        String[] sort = new String[]{"Near to Far", "Far to Near"};
+        ArrayAdapter<String> milesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, MILES);
+        mBinding.milesDropdown.setAdapter(milesAdapter);
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, ORDER);
+        mBinding.orderDropdown.setAdapter(sortAdapter);
 
         // Set Featured trips recycler view
         mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity());
@@ -104,6 +113,7 @@ public class FeaturedTripsFragment extends Fragment {
             public void locationChanged() {
                 queryNearbyTrips(DISTANCE_LIMIT_DEFAULT);
                 onFilterClick();
+                onSortClicked();
             }
         });
 
@@ -119,14 +129,36 @@ public class FeaturedTripsFragment extends Fragment {
         mBinding.milesDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int miles = Integer.parseInt(mBinding.milesDropdown.getSelectedItem().toString());
-                queryNearbyTrips(miles);
+                mMiles = Integer.parseInt(mBinding.milesDropdown.getSelectedItem().toString());
+                queryNearbyTrips(mMiles);
                 mNearbyAdapter.clear();
                 mNearbyAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void onSortClicked() {
+        mBinding.orderDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0) {
+                    mReverse = false;
+                }
+                else if(position == 1) {
+                    mReverse = true;
+                }
+                queryNearbyTrips(mMiles);
+                mNearbyAdapter.clear();
+                mNearbyAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
     }
@@ -204,6 +236,9 @@ public class FeaturedTripsFragment extends Fragment {
                 tripObjectIds.add(tripId);
                 mNearbyTrips.add((Trip)tripDetail.getTrip());
             }
+        }
+        if(mReverse) {
+            Collections.reverse(mNearbyTrips);
         }
         mNearbyAdapter.notifyDataSetChanged();
         mBinding.exploreLayout.removeView(mBinding.pbLoading);
