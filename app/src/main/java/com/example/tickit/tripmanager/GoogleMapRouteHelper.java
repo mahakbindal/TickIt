@@ -30,6 +30,7 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.Duration;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,8 +40,13 @@ import java.util.concurrent.TimeUnit;
 public class GoogleMapRouteHelper {
 
     public static final String TAG = "GoogleMapRouteHelper";
+    public static final String KILOMETERS = "km";
+    public static final String DECIMAL_FORMAT = "###.##";
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
     public static final int CAMERA_PADDING = 100;
+    public static final int HOURS_IN_DAY = 24;
+    public static final int MINS_IN_HOUR = 60;
+    public static final double KM_TO_MILES = 1.609;
 
     public Context mContext;
     public List<List<Address>> mLocationsList;
@@ -48,7 +54,8 @@ public class GoogleMapRouteHelper {
     public List<MarkerOptions> mMarkerList;
     private GeoApiContext mGeoApiContext = null;
     GoogleMap mGoogleMap;
-    Long mDuration = 0L;
+    Long mTotalDuration = 0L;
+    List<String> mLegDistances;
     private DurationCallback mDurationCallback;
 
     public GoogleMapRouteHelper(Context context, GoogleMap googleMap, GeoApiContext geoApiContext) {
@@ -58,6 +65,7 @@ public class GoogleMapRouteHelper {
         mLocationsList = new ArrayList<>();
         mLatLngList = new ArrayList<>();
         mMarkerList = new ArrayList<>();
+        mLegDistances = new ArrayList<>();
     }
 
     /* Converts each user input from rawLocationList to a valid address by calling Google's Geocoder
@@ -150,7 +158,8 @@ public class GoogleMapRouteHelper {
                 for(DirectionsRoute route: result.routes){
                     Log.d(TAG, "run: leg: " + route.legs[0].toString());
                     for(int i = 0; i < route.legs.length; i++) {
-                        mDuration += route.legs[i].duration.inSeconds;
+                        mTotalDuration += route.legs[i].duration.inSeconds;
+                        mLegDistances.add(route.legs[i].distance.humanReadable);
                     }
                     if(mDurationCallback != null) {
                         mDurationCallback.getDurationCallback();
@@ -202,13 +211,30 @@ public class GoogleMapRouteHelper {
     public List<List<Address>> getLocationList() { return mLocationsList; }
 
     public String getDuration() {
-        int day = (int) TimeUnit.SECONDS.toDays(mDuration);
-        long hours = TimeUnit.SECONDS.toHours(mDuration) - (day * 24);
-        long minute = TimeUnit.SECONDS.toMinutes(mDuration) - (TimeUnit.SECONDS.toHours(mDuration)* 60);
+        int day = (int) TimeUnit.SECONDS.toDays(mTotalDuration);
+        long hours = TimeUnit.SECONDS.toHours(mTotalDuration) - (day * HOURS_IN_DAY);
+        long minute = TimeUnit.SECONDS.toMinutes(mTotalDuration) - (TimeUnit.SECONDS.toHours(mTotalDuration)* MINS_IN_HOUR);
         StringBuilder duration = new StringBuilder();
         duration.append(day + " days, " + hours + " hours, " + minute + " minutes");
         Log.i(TAG, "Duration" + duration.toString());
         return duration.toString();
+    }
+
+    public double getDistance() {
+        double distance = 0;
+        boolean miles = true;
+        for(String legDistance : mLegDistances) {
+            String filter = String.valueOf(legDistance).replace(",", "");
+            String[] splitDistance = filter.split(" ");
+            double numDistance = Double.parseDouble(splitDistance[0]);
+            distance += numDistance;
+            if(splitDistance[1].equals(KILOMETERS)) miles = false;
+        }
+        if(!miles) {
+            distance /= KM_TO_MILES;
+        }
+        DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT);
+        return Double.parseDouble(df.format(distance));
     }
 
     public interface DurationCallback {

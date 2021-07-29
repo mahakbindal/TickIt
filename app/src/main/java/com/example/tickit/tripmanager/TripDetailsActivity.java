@@ -148,10 +148,10 @@ public class TripDetailsActivity extends AppCompatActivity {
             public void getDurationCallback() {
                 String duration = mRouteHelper.getDuration();
                 mBinding.tvDuration.setText(duration);
+                String distance = mRouteHelper.getDistance() + " miles";
+                mBinding.tvDistance.setText(distance);
             }
         });
-//        String duration = mRouteHelper.getDuration();
-//        mBinding.tvDuration.setText(duration);
     }
 
     private List<LatLng> getLatLngListFromTripDetails() {
@@ -173,7 +173,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             mLocationDetails.add(newLocation);
             mBinding.locationList.addView(newLocation);
             String location = mTripDetails.get(i).getLocation();
-            newLocation.setTextValue(location);
+            newLocation.setTextValue(i+1 + ". " + location);
             waypointNameList.add(location);
         }
         return waypointNameList;

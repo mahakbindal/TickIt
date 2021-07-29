@@ -17,19 +17,22 @@
         android:textStyle="bold"
         android:textSize="25sp"/>
 
-    <LinearLayout
-        android:id="@+id/locationList"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvLocationOverview"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTripTitle"
-        android:layout_marginTop="30dp"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="10dp"
+        android:text="Trip Overview:"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/tvDurationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/locationList"
+        android:layout_below="@+id/tvLocationOverview"
         android:layout_alignParentStart="true"
         android:layout_marginTop="5dp"
         android:layout_marginStart="50dp"
@@ -40,20 +43,49 @@
         android:id="@+id/tvDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/locationList"
+        android:layout_below="@+id/tvLocationOverview"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_toEndOf="@+id/tvDurationText"
         tools:text="1 day, 3 hours, 10 minutes" />
+
+    <TextView
+        android:id="@+id/tvDistanceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDurationText"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="50dp"
+        android:text="Total Distance:"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDurationText"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/tvDistanceText"
+        tools:text="234 miles" />
+
+    <LinearLayout
+        android:id="@+id/locationList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDistanceText"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"></LinearLayout>
 
     <fragment
         android:id="@+id/mapDetails"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="450dp"
-        android:layout_below="@+id/tvDurationText"
+        android:layout_below="@+id/locationList"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp" />
 </RelativeLayout>
