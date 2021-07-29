@@ -62,7 +62,7 @@ public class AllTripsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mAllTrips = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class AllTripsFragment extends Fragment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(@NonNull @NotNull Menu menu) {
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.action_search);
         item.setVisible(true);

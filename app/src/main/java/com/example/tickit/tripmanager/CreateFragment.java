@@ -177,6 +177,12 @@ public class CreateFragment extends Fragment {
             public void onClick(View v) {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 String title = mBinding.etTitle.getText().toString();
+                for(WaypointView waypoint : mWaypointsList) {
+                    if(waypoint.getEditTextValue().isEmpty() || title.isEmpty()) {
+                        Toast.makeText(getContext(), R.string.empty_field, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
                 saveTrip(currentUser, title);
             }
         });
@@ -226,6 +232,9 @@ public class CreateFragment extends Fragment {
         mRawLocationList = new ArrayList<>();
         for(int i = 0; i < mWaypointsList.size(); i++) {
             String loc = mWaypointsList.get(i).getEditTextValue();
+            if(loc.isEmpty() || mBinding.etTitle.getText().toString().isEmpty()) {
+                Toast.makeText(getContext(), R.string.empty_field, Toast.LENGTH_SHORT).show();
+            }
             mRawLocationList.add(loc);
         }
     }
