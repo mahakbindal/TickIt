@@ -3,11 +3,13 @@ package com.example.tickit.tripmanager;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.example.tickit.R;
@@ -25,15 +27,18 @@ import com.google.maps.PendingResult;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class GoogleMapRouteHelper {
 
-    public static final String TAG = "MapRoute";
+    public static final String TAG = "GoogleMapRouteHelper";
     public static final int ADDRESS_RETRIEVAL_MAX = 1;
     public static final int CAMERA_PADDING = 100;
 
@@ -43,6 +48,8 @@ public class GoogleMapRouteHelper {
     public List<MarkerOptions> mMarkerList;
     private GeoApiContext mGeoApiContext = null;
     GoogleMap mGoogleMap;
+    Long mDuration = 0L;
+    private DurationCallback mDurationCallback;
 
     public GoogleMapRouteHelper(Context context, GoogleMap googleMap, GeoApiContext geoApiContext) {
         this.mContext = context;
@@ -136,12 +143,19 @@ public class GoogleMapRouteHelper {
      *  Source: https://github.com/googlemaps/google-maps-services-java */
     private void addPolylinesToMap(final DirectionsResult result){
         new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 Log.d(TAG, "run: result routes: " + result.routes.length);
-
                 for(DirectionsRoute route: result.routes){
                     Log.d(TAG, "run: leg: " + route.legs[0].toString());
+                    for(int i = 0; i < route.legs.length; i++) {
+                        mDuration += route.legs[i].duration.inSeconds;
+                    }
+                    if(mDurationCallback != null) {
+                        mDurationCallback.getDurationCallback();
+                    }
+
                     List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
                     List<LatLng> newDecodedPath = new ArrayList<>();
@@ -186,4 +200,22 @@ public class GoogleMapRouteHelper {
     }
 
     public List<List<Address>> getLocationList() { return mLocationsList; }
+
+    public String getDuration() {
+        int day = (int) TimeUnit.SECONDS.toDays(mDuration);
+        long hours = TimeUnit.SECONDS.toHours(mDuration) - (day * 24);
+        long minute = TimeUnit.SECONDS.toMinutes(mDuration) - (TimeUnit.SECONDS.toHours(mDuration)* 60);
+        StringBuilder duration = new StringBuilder();
+        duration.append(day + " days, " + hours + " hours, " + minute + " minutes");
+        Log.i(TAG, "Duration" + duration.toString());
+        return duration.toString();
+    }
+
+    public interface DurationCallback {
+        void getDurationCallback();
+    }
+
+    public void setDurationCallback(DurationCallback durationCallback) {
+        this.mDurationCallback = durationCallback;
+    }
 }

@@ -232,7 +232,7 @@ public class CreateFragment extends Fragment {
         mRawLocationList = new ArrayList<>();
         for(int i = 0; i < mWaypointsList.size(); i++) {
             String loc = mWaypointsList.get(i).getEditTextValue();
-            if(loc.isEmpty() || mBinding.etTitle.getText().toString().isEmpty()) {
+            if(loc.isEmpty()) {
                 Toast.makeText(getContext(), R.string.empty_field, Toast.LENGTH_SHORT).show();
             }
             mRawLocationList.add(loc);

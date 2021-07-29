@@ -143,6 +143,15 @@ public class TripDetailsActivity extends AppCompatActivity {
         List<String> waypointNameList = updateWaypointList();
         List<LatLng> waypointLatLngList = getLatLngListFromTripDetails();
         mRouteHelper.showRoute(waypointLatLngList, waypointNameList);
+        mRouteHelper.setDurationCallback(new GoogleMapRouteHelper.DurationCallback() {
+            @Override
+            public void getDurationCallback() {
+                String duration = mRouteHelper.getDuration();
+                mBinding.tvDuration.setText(duration);
+            }
+        });
+//        String duration = mRouteHelper.getDuration();
+//        mBinding.tvDuration.setText(duration);
     }
 
     private List<LatLng> getLatLngListFromTripDetails() {
