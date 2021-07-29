@@ -86,7 +86,7 @@ public class FeaturedTripsFragment extends Fragment {
         mTripDetails = new ArrayList<>();
         queryTrips();
         querySavedTrips();
-        
+
         ArrayAdapter<String> milesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, MILES);
         mBinding.milesDropdown.setAdapter(milesAdapter);
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, ORDER);

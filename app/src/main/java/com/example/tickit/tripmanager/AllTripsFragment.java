@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import android.widget.SearchView;
 import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentAllTripsBinding;
 import com.example.tickit.databinding.FragmentFeaturedTripsBinding;
+import com.example.tickit.helpers.EndlessRecyclerViewScrollListener;
+import com.example.tickit.main.MainActivity;
 import com.example.tickit.models.Trip;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -28,6 +31,7 @@ import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AllTripsFragment extends Fragment {
@@ -61,12 +65,13 @@ public class AllTripsFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mAllTrips = new ArrayList<>();
-        queryTrips();
 
         mAllTripsAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity());
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvAllTrips.setAdapter(mAllTripsAdapter);
         mBinding.rvAllTrips.setLayoutManager(gridLayoutManager);
+
+        queryTrips();
     }
 
     private void queryTrips() {

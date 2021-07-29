@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
@@ -14,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.tickit.databinding.FragmentTripsBinding;
+import com.example.tickit.helpers.EndlessRecyclerViewScrollListener;
+import com.example.tickit.main.MainActivity;
 import com.example.tickit.models.Trip;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -21,6 +24,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,8 +34,10 @@ public class TripsFragment extends Fragment {
 
     public static final String TAG = "TripsFragment";
     public static final int GRID_COUNT = 2;
+    public static final int LIMIT = 6;
 
     private FragmentTripsBinding mBinding;
+    private EndlessRecyclerViewScrollListener mScrollListener;
     protected List<Trip> mAllTrips;
     GridLayoutManager mGridLayoutManager;
     TripsAdapter mAdapter;
@@ -76,7 +82,39 @@ public class TripsFragment extends Fragment {
         mGridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvTrips.setAdapter(mAdapter);
         mBinding.rvTrips.setLayoutManager(mGridLayoutManager);
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(mGridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Date createdAt = mAllTrips.get(mAllTrips.size() - 1).getCreatedAt();
+                loadNextDataFromApi(createdAt);
+            }
+        };
+        mBinding.rvTrips.addOnScrollListener(mScrollListener);
         queryTrips();
+    }
+
+    private void loadNextDataFromApi(Date createdAt) {
+        ((MainActivity)getActivity()).showProgressBar();
+        ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
+        query.include(Trip.KEY_USER);
+        query.setLimit(LIMIT);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.addDescendingOrder(Trip.KEY_CREATED_AT);
+        query.whereLessThan(Trip.KEY_CREATED_AT, createdAt);
+
+        query.findInBackground(new FindCallback<Trip>() {
+            @Override
+            public void done(List<Trip> trips, ParseException exception) {
+                ((MainActivity)getActivity()).hideProgressBar();
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting trips", exception);
+                    return;
+                }
+                mAllTrips.addAll(trips);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void fetchTimelineAsync() {
@@ -88,6 +126,7 @@ public class TripsFragment extends Fragment {
     private void queryTrips() {
         ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
         query.include(Trip.KEY_USER);
+        query.setLimit(LIMIT);
         query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
         query.addDescendingOrder(Trip.KEY_CREATED_AT);
 

@@ -23,6 +23,7 @@ import com.parse.ParseUser;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding mBinding;
+    MenuItem mMiActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +72,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mMiActionProgressItem = menu.findItem(R.id.miActionProgress);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.logout) {
             onLogoutClicked();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        mMiActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        mMiActionProgressItem.setVisible(false);
     }
 
     private boolean onLogoutClicked() {
