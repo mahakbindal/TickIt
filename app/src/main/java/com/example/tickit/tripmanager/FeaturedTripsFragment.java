@@ -76,7 +76,6 @@ public class FeaturedTripsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
         mCurrentLocation = new CurrentLocation(getContext());
         mCurrentLocation.getLocation();
@@ -87,9 +86,7 @@ public class FeaturedTripsFragment extends Fragment {
         mTripDetails = new ArrayList<>();
         queryTrips();
         querySavedTrips();
-
-//        String[] miles = new String[]{"100", "500", "1000", "5000", "10000"};
-//        String[] sort = new String[]{"Near to Far", "Far to Near"};
+        
         ArrayAdapter<String> milesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, MILES);
         mBinding.milesDropdown.setAdapter(milesAdapter);
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, ORDER);
@@ -195,6 +192,7 @@ public class FeaturedTripsFragment extends Fragment {
     }
 
     private void queryNearbyTrips(int miles) {
+        mTripDetails.clear();
         ParseQuery<Trip> tripQuery = ParseQuery.getQuery(Trip.class);
         tripQuery.include(Trip.KEY_USER);
         tripQuery.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
@@ -229,6 +227,7 @@ public class FeaturedTripsFragment extends Fragment {
     }
 
     private void filterTripDetails() {
+        mNearbyTrips.clear();
         List<String> tripObjectIds = new ArrayList<>();
         for(TripDetails tripDetail : mTripDetails) {
             String tripId = tripDetail.getTrip().getObjectId();
