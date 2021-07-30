@@ -97,6 +97,12 @@ public class TripDetailsActivity extends AppCompatActivity {
         });
 
         mBinding.tvTripTitle.setText(mTrip.getTitle());
+        try {
+            String username = mTrip.getUser().fetchIfNeeded().getUsername();
+            mBinding.tvUsername.setText(username);
+        } catch (ParseException exception) {
+            exception.printStackTrace();
+        }
 
         mCommentsAdapter = new TripCommentsAdapter(this, mAllComments);
         mBinding.rvComments.setAdapter(mCommentsAdapter);
