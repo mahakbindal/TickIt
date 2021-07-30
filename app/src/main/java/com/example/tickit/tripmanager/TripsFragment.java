@@ -95,7 +95,6 @@ public class TripsFragment extends Fragment {
     }
 
     private void loadNextDataFromApi(Date createdAt) {
-        ((MainActivity)getActivity()).showProgressBar();
         ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
         query.include(Trip.KEY_USER);
         query.setLimit(LIMIT);
@@ -106,7 +105,6 @@ public class TripsFragment extends Fragment {
         query.findInBackground(new FindCallback<Trip>() {
             @Override
             public void done(List<Trip> trips, ParseException exception) {
-                ((MainActivity)getActivity()).hideProgressBar();
                 if(exception != null) {
                     Log.e(TAG, "Issue with getting trips", exception);
                     return;

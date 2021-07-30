@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.tickit.R;
@@ -39,6 +41,7 @@ public class TripDetailsActivity extends AppCompatActivity {
     public static final String TAG = "TripDetailsActivity";
     public static final String TRIP_EXTRA = "trip";
     public static final String TRIP_CLASS = "Trip";
+    public static final String SHARE_TYPE = "text/plain";
 
     public ActivityTripDetailsBinding mBinding;
     GoogleMap mGoogleMap;
@@ -177,5 +180,35 @@ public class TripDetailsActivity extends AppCompatActivity {
             waypointNameList.add(location);
         }
         return waypointNameList;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_share);
+        item.setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_share, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.action_share) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "Sharing my trip: " + mBinding.tvTripTitle.getText().toString());
+            sendIntent.setType(SHARE_TYPE);
+
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            startActivity(shareIntent);
+            return true;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
