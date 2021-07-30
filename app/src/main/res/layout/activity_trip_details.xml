@@ -1,91 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".tripmanager.TripDetailsActivity">
 
-    <TextView
-        android:id="@+id/tvTripTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Roadtrip through California"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:textStyle="bold"
-        android:textSize="25sp"/>
-
-    <TextView
-        android:id="@+id/tvLocationOverview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvTripTitle"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="10dp"
-        android:text="Trip Overview:"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
-
-    <TextView
-        android:id="@+id/tvDurationText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvLocationOverview"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="5dp"
-        android:layout_marginStart="50dp"
-        android:text="Total Duration:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvDuration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvLocationOverview"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_toEndOf="@+id/tvDurationText"
-        tools:text="1 day, 3 hours, 10 minutes" />
-
-    <TextView
-        android:id="@+id/tvDistanceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvDurationText"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="5dp"
-        android:layout_marginStart="50dp"
-        android:text="Total Distance:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvDistance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvDurationText"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_toEndOf="@+id/tvDistanceText"
-        tools:text="234 miles" />
-
-    <LinearLayout
-        android:id="@+id/locationList"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvDistanceText"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tvTripTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Roadtrip through California"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textSize="25sp"/>
 
-    <fragment
-        android:id="@+id/mapDetails"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="450dp"
-        android:layout_below="@+id/locationList"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="20dp" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tvLocationOverview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTripTitle"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="10dp"
+            android:text="Trip Overview:"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/tvDurationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvLocationOverview"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="50dp"
+            android:text="Total Duration:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvLocationOverview"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/tvDurationText"
+            tools:text="1 day, 3 hours, 10 minutes" />
+
+        <TextView
+            android:id="@+id/tvDistanceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDurationText"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="50dp"
+            android:text="Total Distance:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDurationText"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/tvDistanceText"
+            tools:text="234 miles" />
+
+        <LinearLayout
+            android:id="@+id/locationList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDistanceText"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"></LinearLayout>
+
+        <fragment
+            android:id="@+id/mapDetails"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_below="@+id/locationList"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvComments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/mapDetails"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"/>
+
+        <EditText
+            android:id="@+id/etComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rvComments"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="80dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/btnSendComment"
+            android:ems="10"
+            android:hint="Say something..."
+            android:inputType="textPersonName" />
+
+        <ImageButton
+            android:id="@+id/btnSendComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rvComments"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/light_teal"
+            android:src="@android:drawable/ic_menu_send"
+            android:text="Send"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</ScrollView>

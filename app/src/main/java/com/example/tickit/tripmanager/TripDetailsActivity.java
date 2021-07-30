@@ -2,6 +2,7 @@ package com.example.tickit.tripmanager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.tickit.R;
 import com.example.tickit.databinding.ActivityTripDetailsBinding;
 import com.example.tickit.models.Trip;
+import com.example.tickit.models.TripComments;
 import com.example.tickit.models.TripDetails;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,6 +30,8 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -48,6 +53,8 @@ public class TripDetailsActivity extends AppCompatActivity {
     private GeoApiContext mGeoApiContext = null;
     private GoogleMapRouteHelper mRouteHelper;
     public Trip mTrip;
+    private List<TripComments> mAllComments;
+    private TripCommentsAdapter mCommentsAdapter;
     private List<TripDetails> mTripDetails;
     private List<LocationDetailsView> mLocationDetails;
     private Map<String, String> mMarkerTitleDescription = new HashMap<>();
@@ -61,6 +68,7 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         mTripDetails = new ArrayList<>();
         mLocationDetails = new ArrayList<>();
+        mAllComments = new ArrayList<>();
 
         Intent intent = getIntent();
         mTrip = Parcels.unwrap(intent.getParcelableExtra(TRIP_EXTRA));
@@ -90,6 +98,67 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         mBinding.tvTripTitle.setText(mTrip.getTitle());
 
+        mCommentsAdapter = new TripCommentsAdapter(this, mAllComments);
+        mBinding.rvComments.setAdapter(mCommentsAdapter);
+        mBinding.rvComments.setLayoutManager(new LinearLayoutManager(this));
+
+        queryTripComments(mTrip);
+
+        sendCommentClickListener();
+
+    }
+
+    private void sendCommentClickListener() {
+        mBinding.btnSendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String comment = mBinding.etComment.getText().toString();
+                if(comment.isEmpty()) {
+                    Toast.makeText(TripDetailsActivity.this, "Your comment is empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                saveTripComment(comment);
+            }
+        });
+    }
+
+    private void queryTripComments(Trip trip) {
+        ParseQuery<TripComments> query = ParseQuery.getQuery(TripComments.class);
+//        query.whereEqualTo(Trip.KEY_OBJECT_ID, mTrip.getObjectId());
+        ParseObject tripObjId = ParseObject.createWithoutData(TRIP_CLASS, trip.getObjectId());
+        query.whereEqualTo(TripComments.KEY_TRIP, tripObjId);
+        Log.i(TAG, trip.getObjectId());
+        query.addAscendingOrder(TripComments.KEY_CREATED_AT);
+        query.findInBackground(new FindCallback<TripComments>() {
+            @Override
+            public void done(List<TripComments> tripComments, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting trip comments", exception);
+                    return;
+                }
+                mAllComments.addAll(tripComments);
+                mCommentsAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void saveTripComment(String comment) {
+        TripComments tripComment = new TripComments();
+        tripComment.setTrip(mTrip);
+        tripComment.setUser(ParseUser.getCurrentUser());
+        tripComment.setComment(comment);
+
+        tripComment.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue saving trip comment", exception);
+                }
+                mAllComments.add(tripComment);
+                mBinding.etComment.setText("");
+                mCommentsAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public static Intent newIntent(Context context, Trip trip) {
