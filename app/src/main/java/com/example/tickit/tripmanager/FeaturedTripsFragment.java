@@ -1,5 +1,8 @@
 package com.example.tickit.tripmanager;
 
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,21 +19,33 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentFeaturedTripsBinding;
 import com.example.tickit.models.Trip;
 import com.example.tickit.models.TripDetails;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.security.auth.callback.Callback;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +58,7 @@ public class FeaturedTripsFragment extends Fragment {
     public static final int DISTANCE_LIMIT_DEFAULT = 100;
     public static final String[] MILES = new String[]{"100", "500", "1000", "5000", "10000"};
     public static final String[] ORDER = new String[]{"Near to Far", "Far to Near"};
+    private static final int AUTOCOMPLETE_CODE = 100;
 
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -54,6 +70,7 @@ public class FeaturedTripsFragment extends Fragment {
     TripsAdapter mNearbyAdapter;
     TripsAdapter mSavedAdapter;
     CurrentLocation mCurrentLocation;
+    ParseGeoPoint mGeopoint = null;
     int mMiles = DISTANCE_LIMIT_DEFAULT;
     boolean mReverse = false;
 
@@ -71,6 +88,10 @@ public class FeaturedTripsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = FragmentFeaturedTripsBinding.inflate(inflater, container, false);
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getActivity().getApplicationContext(), getString(R.string.google_maps_api_key));
+        }
         return mBinding.getRoot();
     }
 
@@ -114,12 +135,46 @@ public class FeaturedTripsFragment extends Fragment {
             }
         });
 
+        mBinding.etLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(getActivity());
+                startActivityForResult(intent, AUTOCOMPLETE_CODE);
+            }
+        });
+
         // Set Saved trips recycler view
         mSavedAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity());
         mSavedAdapter.notifyDataSetChanged();
         LinearLayoutManager linearLayoutManagerSaved = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvMostSaved.setAdapter(mSavedAdapter);
         mBinding.rvMostSaved.setLayoutManager(linearLayoutManagerSaved);
+    }
+
+    private void getLatLng() {
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        mBinding.btnFind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Address> addressList = new ArrayList<>();
+                try {
+                    addressList = geocoder.getFromLocationName(mBinding.etLocation.getText().toString(), 1);
+                    Address address = addressList.get(0);
+                    mGeopoint = new ParseGeoPoint(address.getLatitude(), address.getLongitude());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(addressList.isEmpty()) {
+                    Toast.makeText(getContext(), "Location is empty. Using current location.", Toast.LENGTH_SHORT).show();
+                    mGeopoint = null;
+                }
+                queryNearbyTrips(mMiles);
+                mNearbyAdapter.clear();
+                mNearbyAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void onFilterClick() {
@@ -196,7 +251,6 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<Trip> tripQuery = ParseQuery.getQuery(Trip.class);
         tripQuery.include(Trip.KEY_USER);
         tripQuery.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
-        ParseGeoPoint geoPoint = mCurrentLocation.getCurrentLocation();
         tripQuery.findInBackground(new FindCallback<Trip>() {
             @Override
             public void done(List<Trip> trips, ParseException exception) {
@@ -206,6 +260,10 @@ public class FeaturedTripsFragment extends Fragment {
                 List<String> tripIds = new ArrayList<>();
                 for (Trip trip : trips) {
                     tripIds.add(trip.getObjectId());
+                }
+                ParseGeoPoint geoPoint = mCurrentLocation.getCurrentLocation();
+                if(mGeopoint != null) {
+                    geoPoint = mGeopoint;
                 }
                 ParseQuery<TripDetails> tripDetailsQuery = ParseQuery.getQuery(TripDetails.class);
                 Log.i(TAG, "latitude: " + geoPoint.getLatitude() + " longitude: " + geoPoint.getLongitude());
@@ -258,5 +316,16 @@ public class FeaturedTripsFragment extends Fragment {
                 mSavedAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        if(requestCode == AUTOCOMPLETE_CODE && resultCode == RESULT_OK) {
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            Log.i(TAG, "Place: " + place.getAddress());
+            mBinding.etLocation.setText(place.getAddress());
+            getLatLng();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
