@@ -17,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TickIt">
-        <activity android:name=".tripmanager.TripDetailsActivity"></activity>
+        <activity android:name=".tripmanager.UserProfileActivity"></activity>
+        <activity android:name=".tripmanager.MainActivity" />
+        <activity android:name=".tripmanager.TripDetailsActivity" />
         <activity android:name=".accounts.SignUpActivity" />
         <activity android:name=".main.MainActivity" />
         <activity android:name=".accounts.LoginActivity">

@@ -43,7 +43,9 @@
                 android:layout_marginStart="5dp"
                 tools:text="mahakbindal"
                 android:textStyle="bold"
-                android:textColor="#2e5f3c"/>
+                android:textColor="#2e5f3c"
+                android:onClick="onClick"
+                android:clickable="true"/>
 
         </LinearLayout>
 

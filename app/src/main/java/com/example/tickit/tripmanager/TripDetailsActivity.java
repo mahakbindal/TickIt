@@ -286,4 +286,9 @@ public class TripDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void onClick(View view) {
+        Log.i(TAG, "Username clicked!");
+        startActivity(UserProfileActivity.userInfoIntent(this, mTrip.getUser()));
+    }
 }
