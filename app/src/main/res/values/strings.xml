@@ -20,4 +20,5 @@
     <string name="saveSuccess">Trip Saved!</string>
     <string name="nullMap">Google Map is not initialized</string>
     <string name="share">"Sharing my trip: "</string>
+    <string name="nearbyLocation">Location is empty. Using current location.</string>
 </resources>

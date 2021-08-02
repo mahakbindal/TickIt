@@ -1,5 +1,6 @@
 package com.example.tickit.tripmanager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,12 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
@@ -30,7 +30,6 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
@@ -59,6 +58,8 @@ public class FeaturedTripsFragment extends Fragment {
     public static final String[] MILES = new String[]{"100", "500", "1000", "5000", "10000"};
     public static final String[] ORDER = new String[]{"Near to Far", "Far to Near"};
     private static final int AUTOCOMPLETE_CODE = 100;
+    public static final int MAX_ADDRESS = 1;
+    private static final int FLAG = 0;
 
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
@@ -159,7 +160,7 @@ public class FeaturedTripsFragment extends Fragment {
             public void onClick(View v) {
                 List<Address> addressList = new ArrayList<>();
                 try {
-                    addressList = geocoder.getFromLocationName(mBinding.etLocation.getText().toString(), 1);
+                    addressList = geocoder.getFromLocationName(mBinding.etLocation.getText().toString(), MAX_ADDRESS);
                     Address address = addressList.get(0);
                     mGeopoint = new ParseGeoPoint(address.getLatitude(), address.getLongitude());
 
@@ -167,9 +168,11 @@ public class FeaturedTripsFragment extends Fragment {
                     e.printStackTrace();
                 }
                 if(addressList.isEmpty()) {
-                    Toast.makeText(getContext(), "Location is empty. Using current location.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.nearbyLocation, Toast.LENGTH_SHORT).show();
                     mGeopoint = null;
                 }
+                InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), FLAG);
                 queryNearbyTrips(mMiles);
                 mNearbyAdapter.clear();
                 mNearbyAdapter.notifyDataSetChanged();
@@ -319,10 +322,9 @@ public class FeaturedTripsFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == AUTOCOMPLETE_CODE && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
-            Log.i(TAG, "Place: " + place.getAddress());
             mBinding.etLocation.setText(place.getAddress());
             getLatLng();
         }

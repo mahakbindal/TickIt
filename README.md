@@ -24,23 +24,33 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 
 **Required Must-have Stories**
 
-- [ ] User can create a new account
-- [ ] User can login
-- [ ] User can "Create a New Trip"
-- [ ] User can add locations from their trip
-- [ ] User can generate a map with trip route based on locations (Google Maps API)
-- [ ] User can view feed of their itineraries
-- [ ] User can open a detailed view of existing itinerary
+- [x] User can create a new account
+- [x] User can login
+- [x] User can "Create a New Trip"
+- [x] User can add locations from their trip
+- [x] User can generate a map with trip route based on locations (Google Maps API)
+- [x] User can view feed of their itineraries
+- [x] User can open a detailed view of existing itinerary
 
 **Optional Nice-to-have Stories**
 
-- [ ] User can make their trip public
-- [ ] User can see their itinerary and other user's itineraries in the Explore page, if public
+- [ ] User can make their trip private
+- [x] User can see their itinerary and other user's itineraries in the Explore page, if public
 - [ ] User can share itinerary with other users they choose
 - [ ] User can add pictures to specific locations in their itinerary
-- [ ] User can save other users' itineraries
-- [ ] User can search in the Explore page to find other users' itineraries
-- [ ] User can view trip metrics
+- [x] User can double tap to save other users' itineraries
+- [x] User can search in the Explore page to find other users' itineraries
+- [x] User can view trip metrics
+- [x] User can use autocomplete to find locations
+- [x] User can click on the marker info window to add descriptions to each location
+- [x] User can discover trips from various categories (featured, nearby, most saved)
+- [x] User can filter nearby trips
+    - [x] Filter by miles
+    - [x] Sort Nearest to Farthest, and Farthest to Nearest
+    - [x] User can either filter by current location or a specific location
+- [x] User can comment on trip itineraries
+- [x] User can share their or other users' trips
+- [x] User can choose an image from their gallery to set as a cover image for the trip
 
 ### 2. Screen Archetypes
 

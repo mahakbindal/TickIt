@@ -157,7 +157,7 @@ public class CreateFragment extends Fragment {
                     e.printStackTrace();
                 }
                 InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(),FLAG);
+                inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), FLAG);
             }
         });
     }
