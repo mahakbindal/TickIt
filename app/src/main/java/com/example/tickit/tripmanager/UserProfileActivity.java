@@ -42,6 +42,7 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         ParseUser userObjectId = intent.getParcelableExtra(USER_ID_EXTRA);
         queryUserTrips(userObjectId);
+        mBinding.tvUsername.setText("@" + userObjectId.getUsername());
 
         mTripsAdapter = new TripsAdapter(this, mAllUserTrips, UserProfileActivity.this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COUNT);

@@ -79,7 +79,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Downloads/noimage.jpeg" />
+                                                <entry key="imagePath" value="$USER_HOME$/Desktop/notsaved.png" />
                                                 <entry key="scalingPercent" value="99" />
                                               </map>
                                             </option>
@@ -112,7 +112,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="image_holder" />
+                                      <entry key="outputName" value="heart" />
                                     </map>
                                   </option>
                                 </PersistentState>
