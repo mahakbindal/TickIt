@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.example.tickit.R;
 import com.example.tickit.databinding.ActivityUserProfileBinding;
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -29,6 +30,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ActivityUserProfileBinding mBinding;
     private List<Trip> mAllUserTrips;
     private TripsAdapter mTripsAdapter;
+    private List<String> mAllSavedTrips;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +40,15 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(view);
 
         mAllUserTrips = new ArrayList<>();
+        mAllSavedTrips = new ArrayList<>();
+        queryAllSavedTrips();
 
         Intent intent = getIntent();
         ParseUser userObjectId = intent.getParcelableExtra(USER_ID_EXTRA);
         queryUserTrips(userObjectId);
         mBinding.tvUsername.setText("@" + userObjectId.getUsername());
 
-        mTripsAdapter = new TripsAdapter(this, mAllUserTrips, UserProfileActivity.this);
+        mTripsAdapter = new TripsAdapter(this, mAllUserTrips, UserProfileActivity.this, mAllSavedTrips);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COUNT);
         mBinding.rvUserTrips.setAdapter(mTripsAdapter);
         mBinding.rvUserTrips.setLayoutManager(gridLayoutManager);
@@ -74,5 +78,22 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.putExtra(USER_ID_EXTRA, userObjectId);
         return intent;
+    }
+
+    private void queryAllSavedTrips() {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        query.include(Trip.KEY_USER);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<SavedTrips>() {
+            @Override
+            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting saved trips", exception);
+                }
+                for(SavedTrips trip : savedTrips) {
+                    mAllSavedTrips.add(trip.getTrip().getObjectId());
+                }
+            }
+        });
     }
 }

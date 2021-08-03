@@ -3,12 +3,15 @@ package com.example.tickit.tripmanager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +24,7 @@ import com.example.tickit.R;
 import com.example.tickit.main.MainActivity;
 import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -42,11 +46,14 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     private List<Trip> mTrips;
     private Activity mActivity;
     private List<String> mSavedTrips;
+    private List<String> mAllSavedTrips;
+    Trip mTrip;
 
-    public TripsAdapter(Context context, List<Trip> mTrips, Activity activity) {
+    public TripsAdapter(Context context, List<Trip> mTrips, Activity activity, List<String> allSavedTrips) {
         this.mContext = context;
         this.mTrips = mTrips;
         this.mActivity = activity;
+        this.mAllSavedTrips = allSavedTrips;
         mSavedTrips = new ArrayList<>();
     }
 
@@ -61,15 +68,34 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     }
 
     private void onTripClicked(ViewHolder viewHolder) {
+
         viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
             GestureDetector gestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener(){
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mSavedTrips.contains(trip.getObjectId())) {
+//                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mSavedTrips.contains(trip.getObjectId())) {
+//                        saveSavedTrip(trip);
+//                    }
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && (int) viewHolder.mSaveButton.getTag() == R.mipmap.unsaved_foreground) {
                         saveSavedTrip(trip);
+                        viewHolder.mSaveButton.setImageResource(R.mipmap.saved_foreground);
+                        viewHolder.mSaveButton.setTag(R.mipmap.saved_foreground);
                     }
+                    else if((int)viewHolder.mSaveButton.getTag() == R.mipmap.saved_foreground) {
+                        viewHolder.mSaveButton.setImageResource(R.mipmap.unsaved_foreground);
+                        viewHolder.mSaveButton.setTag(R.mipmap.unsaved_foreground);
+                        SavedTrips savedTrip = new SavedTrips();
+                        savedTrip.setTrip(trip);
+                        savedTrip.setUser(ParseUser.getCurrentUser());
+                        savedTrip.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
 
+                            }
+                        });
+
+                    }
                     return super.onDoubleTap(e);
                 }
 
@@ -127,7 +153,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                     Log.e(TAG, "Issue with getting saved trips", exception);
                 }
                 for(SavedTrips trip : savedTrips) {
-                    mSavedTrips.add(trip.getTrip().getObjectId());
+                    String objId = trip.getTrip().getObjectId();
+                    if(!mSavedTrips.contains(objId)) {
+                        mSavedTrips.add(trip.getTrip().getObjectId());
+                    }
+
                 }
             }
         });
@@ -135,14 +165,23 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Trip trip = (Trip) mTrips.get(position);
-        holder.mRootView.setTag(trip);
+//        Trip trip = (Trip) mTrips.get(position);
+        mTrip = (Trip) mTrips.get(position);
+
+        if(mAllSavedTrips.contains(mTrip.getObjectId())) {
+            holder.mSaveButton.setImageResource(R.mipmap.saved_foreground);
+            holder.mSaveButton.setTag(R.mipmap.saved_foreground);
+        } else {
+            holder.mSaveButton.setImageResource(R.mipmap.unsaved_foreground);
+            holder.mSaveButton.setTag(R.mipmap.unsaved_foreground);
+        }
+        holder.mRootView.setTag(mTrip);
         try {
-            holder.mTvTripName.setText(trip.fetchIfNeeded().getString(TRIP_TITLE));
+            holder.mTvTripName.setText(mTrip.fetchIfNeeded().getString(TRIP_TITLE));
         } catch (ParseException exception) {
             exception.printStackTrace();
         }
-        ParseFile image = trip.getImage();
+        ParseFile image = mTrip.getImage();
         Glide.with(mContext).load(image.getUrl()).into(holder.mIvTripPic);
     }
 
@@ -174,6 +213,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         private ImageView mIvTripPic;
         private View mVPalette;
         private TextView mTvTripName;
+        private ImageButton mSaveButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -181,6 +221,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
             mIvTripPic = itemView.findViewById(R.id.ivTripPic);
             mVPalette = itemView.findViewById(R.id.vPalette);
             mTvTripName = itemView.findViewById(R.id.tvTripName);
+            mSaveButton = itemView.findViewById(R.id.ibSave);
         }
 
     }

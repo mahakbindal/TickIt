@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentFeaturedTripsBinding;
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
 import com.example.tickit.models.TripDetails;
 import com.google.android.libraries.places.api.Places;
@@ -64,6 +65,7 @@ public class FeaturedTripsFragment extends Fragment {
     private FragmentFeaturedTripsBinding mBinding;
     protected List<Trip> mAllTrips;
     List<Trip> mSavedTrips;
+    List<String> mAllSavedTrips;
     List<Trip> mFeaturedTrips;
     List<Trip> mNearbyTrips;
     List<TripDetails> mTripDetails;
@@ -105,8 +107,10 @@ public class FeaturedTripsFragment extends Fragment {
         mFeaturedTrips = new ArrayList<>();
         mNearbyTrips = new ArrayList<>();
         mSavedTrips = new ArrayList<>();
+        mAllSavedTrips = new ArrayList<>();
         mTripDetails = new ArrayList<>();
         queryTrips();
+        queryAllSavedTrips();
         querySavedTrips();
 
         ArrayAdapter<String> milesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, MILES);
@@ -115,13 +119,13 @@ public class FeaturedTripsFragment extends Fragment {
         mBinding.orderDropdown.setAdapter(sortAdapter);
 
         // Set Featured trips recycler view
-        mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity());
+        mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity(), mAllSavedTrips);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvFeatured.setAdapter(mFeaturedAdapter);
         mBinding.rvFeatured.setLayoutManager(linearLayoutManager);
 
         // Set Nearby trips recycler view
-        mNearbyAdapter = new TripsAdapter(getContext(), mNearbyTrips, getActivity());
+        mNearbyAdapter = new TripsAdapter(getContext(), mNearbyTrips, getActivity(), mAllSavedTrips);
         LinearLayoutManager linearLayoutManagerNearby = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvNearbyTrips.setAdapter(mNearbyAdapter);
         mBinding.rvNearbyTrips.setLayoutManager(linearLayoutManagerNearby);
@@ -146,7 +150,7 @@ public class FeaturedTripsFragment extends Fragment {
         });
 
         // Set Saved trips recycler view
-        mSavedAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity());
+        mSavedAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity(), mAllSavedTrips);
         mSavedAdapter.notifyDataSetChanged();
         LinearLayoutManager linearLayoutManagerSaved = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvMostSaved.setAdapter(mSavedAdapter);
@@ -305,6 +309,23 @@ public class FeaturedTripsFragment extends Fragment {
         mBinding.pbLoading.setVisibility(ProgressBar.INVISIBLE);
     }
 
+    private void queryAllSavedTrips() {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        query.include(Trip.KEY_USER);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<SavedTrips>() {
+            @Override
+            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting saved trips", exception);
+                }
+                for(SavedTrips trip : savedTrips) {
+                    mAllSavedTrips.add(trip.getTrip().getObjectId());
+                }
+            }
+        });
+    }
+
     private void querySavedTrips() {
         ParseQuery<Trip> query = new ParseQuery<>(Trip.class);
         query.include(Trip.KEY_SAVE_COUNT);
@@ -313,7 +334,7 @@ public class FeaturedTripsFragment extends Fragment {
         query.setLimit(SAVED_TRIPS_LIMIT);
         query.findInBackground(new FindCallback<Trip>() {
             @Override
-            public void done(List<Trip> savedTrips, ParseException e) {
+            public void done(List<Trip> savedTrips, ParseException exception) {
                 Log.i(TAG, "Saved trips: " + savedTrips);
                 mSavedTrips.addAll(savedTrips);
                 mSavedAdapter.notifyDataSetChanged();

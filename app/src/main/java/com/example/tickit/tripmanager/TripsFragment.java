@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.example.tickit.databinding.FragmentTripsBinding;
 import com.example.tickit.helpers.EndlessRecyclerViewScrollListener;
 import com.example.tickit.main.MainActivity;
+import com.example.tickit.models.SavedTrips;
 import com.example.tickit.models.Trip;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -39,6 +40,7 @@ public class TripsFragment extends Fragment {
     private FragmentTripsBinding mBinding;
     private EndlessRecyclerViewScrollListener mScrollListener;
     protected List<Trip> mAllTrips;
+    private List<String> mAllSavedTrips;
     GridLayoutManager mGridLayoutManager;
     TripsAdapter mAdapter;
 
@@ -60,6 +62,8 @@ public class TripsFragment extends Fragment {
 
         // Lookup the swipe container view
         // Setup refresh listener which triggers new data loading
+        mAllSavedTrips = new ArrayList<>();
+        queryAllSavedTrips();
         mBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -77,7 +81,7 @@ public class TripsFragment extends Fragment {
 
         mAllTrips = new ArrayList<>();
 
-        mAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity());
+        mAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity(), mAllSavedTrips);
 
         mGridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvTrips.setAdapter(mAdapter);
@@ -141,5 +145,22 @@ public class TripsFragment extends Fragment {
             }
         });
 
+    }
+
+    private void queryAllSavedTrips() {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        query.include(Trip.KEY_USER);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<SavedTrips>() {
+            @Override
+            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting saved trips", exception);
+                }
+                for(SavedTrips trip : savedTrips) {
+                    mAllSavedTrips.add(trip.getTrip().getObjectId());
+                }
+            }
+        });
     }
 }

@@ -34,6 +34,7 @@ public class SavedTripsFragment extends Fragment {
 
     private FragmentSavedTripsBinding mBinding;
     private List<Trip> mSavedTrips;
+    private List<String> mSavedTripsId;
     private TripsAdapter mAdapter;
 
     public SavedTripsFragment() {
@@ -52,9 +53,10 @@ public class SavedTripsFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mSavedTrips = new ArrayList<>();
+        mSavedTripsId = new ArrayList<>();
         querySavedTrips();
 
-        mAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity());
+        mAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity(), mSavedTripsId);
 //        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 //        mBinding.rvSaved.setLayoutManager(linearLayoutManager);
 //        mBinding.rvSaved.setAdapter(mAdapter);
@@ -78,6 +80,7 @@ public class SavedTripsFragment extends Fragment {
                 }
                 for(SavedTrips trip : savedTrips) {
                     mSavedTrips.add((Trip) trip.getTrip());
+                    mSavedTripsId.add(trip.getTrip().getObjectId());
                 }
                 Log.i(TAG, "Saved trips: " + mSavedTrips);
                 mAdapter.notifyDataSetChanged();
