@@ -42,7 +42,7 @@ public class TripsFragment extends Fragment {
     protected List<Trip> mAllTrips;
     private List<String> mAllSavedTrips;
     GridLayoutManager mGridLayoutManager;
-    TripsAdapter mAdapter;
+    MyTripsAdapter mAdapter;
 
     public TripsFragment() {
         // Required empty public constructor
@@ -81,7 +81,7 @@ public class TripsFragment extends Fragment {
 
         mAllTrips = new ArrayList<>();
 
-        mAdapter = new TripsAdapter(getContext(), mAllTrips, getActivity(), mAllSavedTrips);
+        mAdapter = new MyTripsAdapter(getContext(), getActivity(), mAllTrips);
 
         mGridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvTrips.setAdapter(mAdapter);

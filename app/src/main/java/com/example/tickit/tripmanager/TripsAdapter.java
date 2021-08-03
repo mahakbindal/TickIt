@@ -61,7 +61,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     @Override
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
-        querySavedTrips();
+//        querySavedTrips();
         ViewHolder viewHolder = new ViewHolder(view);
         onTripClicked(viewHolder);
         return viewHolder;
@@ -87,6 +87,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                         viewHolder.mSaveButton.setTag(R.mipmap.unsaved_foreground);
                         SavedTrips savedTrip = new SavedTrips();
                         savedTrip.setTrip(trip);
+                        mTrip.setSaveCount(mTrip.getSaveCount() - 1);
                         savedTrip.setUser(ParseUser.getCurrentUser());
                         savedTrip.deleteInBackground(new DeleteCallback() {
                             @Override
@@ -142,26 +143,26 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
     }
 
-    private void querySavedTrips() {
-        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
-        query.include(Trip.KEY_USER);
-        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
-        query.findInBackground(new FindCallback<SavedTrips>() {
-            @Override
-            public void done(List<SavedTrips> savedTrips, ParseException exception) {
-                if(exception != null) {
-                    Log.e(TAG, "Issue with getting saved trips", exception);
-                }
-                for(SavedTrips trip : savedTrips) {
-                    String objId = trip.getTrip().getObjectId();
-                    if(!mSavedTrips.contains(objId)) {
-                        mSavedTrips.add(trip.getTrip().getObjectId());
-                    }
-
-                }
-            }
-        });
-    }
+//    private void querySavedTrips() {
+//        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+//        query.include(Trip.KEY_USER);
+//        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+//        query.findInBackground(new FindCallback<SavedTrips>() {
+//            @Override
+//            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+//                if(exception != null) {
+//                    Log.e(TAG, "Issue with getting saved trips", exception);
+//                }
+//                for(SavedTrips trip : savedTrips) {
+//                    String objId = trip.getTrip().getObjectId();
+//                    if(!mSavedTrips.contains(objId)) {
+//                        mSavedTrips.add(trip.getTrip().getObjectId());
+//                    }
+//
+//                }
+//            }
+//        });
+//    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {

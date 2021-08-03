@@ -30,6 +30,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ActivityUserProfileBinding mBinding;
     private List<Trip> mAllUserTrips;
     private TripsAdapter mTripsAdapter;
+    private MyTripsAdapter mMyTripsAdapter;
     private List<String> mAllSavedTrips;
 
     @Override
@@ -48,9 +49,16 @@ public class UserProfileActivity extends AppCompatActivity {
         queryUserTrips(userObjectId);
         mBinding.tvUsername.setText("@" + userObjectId.getUsername());
 
-        mTripsAdapter = new TripsAdapter(this, mAllUserTrips, UserProfileActivity.this, mAllSavedTrips);
+        if((ParseUser.getCurrentUser().getObjectId()).equals(userObjectId.getObjectId())) {
+            mMyTripsAdapter = new MyTripsAdapter(this, UserProfileActivity.this, mAllUserTrips);
+            mBinding.rvUserTrips.setAdapter(mMyTripsAdapter);
+        } else {
+            mTripsAdapter = new TripsAdapter(this, mAllUserTrips, UserProfileActivity.this, mAllSavedTrips);
+            mBinding.rvUserTrips.setAdapter(mTripsAdapter);
+        }
+
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COUNT);
-        mBinding.rvUserTrips.setAdapter(mTripsAdapter);
+
         mBinding.rvUserTrips.setLayoutManager(gridLayoutManager);
     }
 
@@ -69,7 +77,8 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
                 Log.i(TAG, "Users trips: " + trips);
                 mAllUserTrips.addAll(trips);
-                mTripsAdapter.notifyDataSetChanged();
+                if(mTripsAdapter != null) mTripsAdapter.notifyDataSetChanged();
+                if(mMyTripsAdapter != null) mMyTripsAdapter.notifyDataSetChanged();
             }
         });
     }
