@@ -274,6 +274,7 @@ public class FeaturedTripsFragment extends Fragment {
                 List<String> tripIds = new ArrayList<>();
                 for (Trip trip : trips) {
                     tripIds.add(trip.getObjectId());
+                    Log.i(TAG, trip.getTitle());
                 }
                 ParseGeoPoint geoPoint = mCurrentLocation.getCurrentLocation();
                 if(mGeopoint != null) {
@@ -291,19 +292,23 @@ public class FeaturedTripsFragment extends Fragment {
                             Log.e(TAG, "Issue with getting trip details", exception);
                         }
                         mTripDetails.addAll(tripDetails);
-                        filterTripDetails();
+                        try {
+                            filterTripDetails();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
         });
     }
 
-    private void filterTripDetails() {
+    private void filterTripDetails() throws ParseException {
         mNearbyTrips.clear();
         List<String> tripObjectIds = new ArrayList<>();
         for(TripDetails tripDetail : mTripDetails) {
             String tripId = tripDetail.getTrip().getObjectId();
-            if(!tripObjectIds.contains(tripId)) {
+            if(!tripObjectIds.contains(tripId) && !((Trip)tripDetail.getTrip()).fetchIfNeeded().getBoolean(Trip.KEY_PRIVATE)) {
                 tripObjectIds.add(tripId);
                 mNearbyTrips.add((Trip)tripDetail.getTrip());
             }
