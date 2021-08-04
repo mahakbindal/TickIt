@@ -364,10 +364,4 @@ public class FeaturedTripsFragment extends Fragment {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-    public void notifyAdapterChange() {
-        mSavedAdapter.notifyDataSetChanged();
-        mFeaturedAdapter.notifyDataSetChanged();
-        mNearbyAdapter.notifyDataSetChanged();
-    }
 }

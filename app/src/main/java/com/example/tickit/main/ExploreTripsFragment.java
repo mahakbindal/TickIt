@@ -16,8 +16,6 @@ import android.view.ViewGroup;
 import com.example.tickit.R;
 import com.google.android.material.tabs.TabLayout;
 
-import org.jetbrains.annotations.NotNull;
-
 public class ExploreTripsFragment extends Fragment {
 
     public ExploreTripsFragment() {
@@ -60,7 +58,7 @@ public class ExploreTripsFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
 }

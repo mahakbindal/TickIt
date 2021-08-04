@@ -57,9 +57,6 @@ public class SavedTripsFragment extends Fragment {
         querySavedTrips();
 
         mAdapter = new MyTripsAdapter(getContext(), getActivity(), mSavedTrips);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-//        mBinding.rvSaved.setLayoutManager(linearLayoutManager);
-//        mBinding.rvSaved.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GRID_COUNT);
         mBinding.rvSaved.setAdapter(mAdapter);
         mBinding.rvSaved.setLayoutManager(gridLayoutManager);

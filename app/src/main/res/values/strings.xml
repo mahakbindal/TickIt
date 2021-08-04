@@ -27,4 +27,7 @@
     <string name="enumerate_loc">". "</string>
     <string name="share_trip">"Sharing my trip: "</string>
     <string name="create_new_trip">Create New Trip</string>
+    <string name="days">" days, "</string>
+    <string name="hours">" hours, "</string>
+    <string name="minutes">" minutes"</string>
 </resources>

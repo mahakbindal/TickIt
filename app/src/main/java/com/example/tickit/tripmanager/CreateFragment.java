@@ -155,8 +155,8 @@ public class CreateFragment extends Fragment {
                     getWaypointInput();
                     getRoute();
                     showAlertDialogForMarker();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
                 }
                 InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), FLAG);
@@ -241,6 +241,8 @@ public class CreateFragment extends Fragment {
         }
     }
 
+    /* Shows alert dialog when user clicks on info window. Sets and updates the alert dialog window
+    * based on text from user input. */
     private void showAlertDialogForMarker() {
         View descriptionView = LayoutInflater.from(getContext()).inflate(R.layout.location_description_item, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -297,7 +299,7 @@ public class CreateFragment extends Fragment {
         mGoogleMapRouteHelper.geoLocate(mRawLocationList);
     }
 
-    // Trigger gallery selection for a photo
+    /* Trigger gallery selection for photo. */
     public void onPickPhoto() {
         // Create intent for picking a photo from the gallery
         Intent intent = new Intent(Intent.ACTION_PICK,

@@ -131,7 +131,6 @@ public class TripDetailsActivity extends AppCompatActivity {
 
     private void queryTripComments(Trip trip) {
         ParseQuery<TripComments> query = ParseQuery.getQuery(TripComments.class);
-//        query.whereEqualTo(Trip.KEY_OBJECT_ID, mTrip.getObjectId());
         ParseObject tripObjId = ParseObject.createWithoutData(TRIP_CLASS, trip.getObjectId());
         query.whereEqualTo(TripComments.KEY_TRIP, tripObjId);
         Log.i(TAG, trip.getObjectId());
@@ -289,7 +288,6 @@ public class TripDetailsActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
-        Log.i(TAG, "Username clicked!");
         startActivity(UserProfileActivity.userInfoIntent(this, mTrip.getUser()));
     }
 }

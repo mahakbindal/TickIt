@@ -85,16 +85,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showProgressBar() {
-        // Show progress item
-        mMiActionProgressItem.setVisible(true);
-    }
-
-    public void hideProgressBar() {
-        // Hide progress item
-        mMiActionProgressItem.setVisible(false);
-    }
-
     private boolean onLogoutClicked() {
         ParseUser.logOut();
         Toast.makeText(this, R.string.logout, Toast.LENGTH_SHORT).show();

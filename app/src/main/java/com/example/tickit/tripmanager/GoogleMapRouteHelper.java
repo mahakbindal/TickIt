@@ -1,6 +1,7 @@
 package com.example.tickit.tripmanager;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
@@ -196,18 +197,6 @@ public class GoogleMapRouteHelper {
         return resultList;
     }
 
-    private void drawPolyline() {
-
-        // Add polylines to the map.
-        // Polylines are useful to show a route or some other connection between points.
-        // [START maps_poly_activity_add_polyline_set_tag]
-        // [START maps_poly_activity_add_polyline]
-        Polyline polyline1 = mGoogleMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .addAll(mLatLngList));
-        // [END maps_poly_activity_add_polyline]
-    }
-
     public List<List<Address>> getLocationList() { return mLocationsList; }
 
     public String getDuration() {
@@ -215,7 +204,8 @@ public class GoogleMapRouteHelper {
         long hours = TimeUnit.SECONDS.toHours(mTotalDuration) - (day * HOURS_IN_DAY);
         long minute = TimeUnit.SECONDS.toMinutes(mTotalDuration) - (TimeUnit.SECONDS.toHours(mTotalDuration)* MINS_IN_HOUR);
         StringBuilder duration = new StringBuilder();
-        duration.append(day + " days, " + hours + " hours, " + minute + " minutes");
+        Resources resources = mContext.getResources();
+        duration.append(day + resources.getString(R.string.days) + hours + resources.getString(R.string.hours) + minute + resources.getString(R.string.minutes));
         Log.i(TAG, "Duration" + duration.toString());
         return duration.toString();
     }

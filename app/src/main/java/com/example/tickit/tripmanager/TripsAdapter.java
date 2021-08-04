@@ -61,10 +61,8 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     @Override
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
-//        querySavedTrips();
         setTripToSavedTrip();
         ViewHolder viewHolder = new ViewHolder(view);
-//        onTripClicked(viewHolder);
         return viewHolder;
     }
 
