@@ -86,14 +86,12 @@ public class MyTripsAdapter extends RecyclerView.Adapter<MyTripsAdapter.ViewHold
 
         private View mRootView;
         private ImageView mIvTripPic;
-        private View mVPalette;
         private TextView mTvTripName;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mRootView = itemView;
             mIvTripPic = itemView.findViewById(R.id.ivTripPic);
-            mVPalette = itemView.findViewById(R.id.vPalette);
             mTvTripName = itemView.findViewById(R.id.tvTripName);
         }
     }

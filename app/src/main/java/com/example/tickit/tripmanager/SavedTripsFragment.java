@@ -35,7 +35,7 @@ public class SavedTripsFragment extends Fragment {
     private FragmentSavedTripsBinding mBinding;
     private List<Trip> mSavedTrips;
     private List<String> mSavedTripsId;
-    private TripsAdapter mAdapter;
+    private MyTripsAdapter mAdapter;
 
     public SavedTripsFragment() {
         // Required empty public constructor
@@ -56,7 +56,7 @@ public class SavedTripsFragment extends Fragment {
         mSavedTripsId = new ArrayList<>();
         querySavedTrips();
 
-        mAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity(), mSavedTripsId);
+        mAdapter = new MyTripsAdapter(getContext(), getActivity(), mSavedTrips);
 //        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 //        mBinding.rvSaved.setLayoutManager(linearLayoutManager);
 //        mBinding.rvSaved.setAdapter(mAdapter);

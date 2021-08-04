@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -36,7 +37,9 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
@@ -45,16 +48,15 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     static Context mContext;
     private List<Trip> mTrips;
     private Activity mActivity;
-    private List<String> mSavedTrips;
     private List<String> mAllSavedTrips;
-    Trip mTrip;
+    private Map<String, String> mTripToSavedTrip = new HashMap<>();
+    private boolean mLiked = false;
 
     public TripsAdapter(Context context, List<Trip> mTrips, Activity activity, List<String> allSavedTrips) {
         this.mContext = context;
         this.mTrips = mTrips;
         this.mActivity = activity;
         this.mAllSavedTrips = allSavedTrips;
-        mSavedTrips = new ArrayList<>();
     }
 
     @NonNull
@@ -62,42 +64,26 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     public TripsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_trip, parent, false);
 //        querySavedTrips();
+        setTripToSavedTrip();
         ViewHolder viewHolder = new ViewHolder(view);
-        onTripClicked(viewHolder);
+//        onTripClicked(viewHolder);
         return viewHolder;
     }
 
     private void onTripClicked(ViewHolder viewHolder) {
-
         viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
             GestureDetector gestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener(){
                 @Override
-                public boolean onDoubleTap(MotionEvent e) {
+                public boolean onDoubleTap(MotionEvent event) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-//                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mSavedTrips.contains(trip.getObjectId())) {
-//                        saveSavedTrip(trip);
-//                    }
-                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && (int) viewHolder.mSaveButton.getTag() == R.mipmap.unsaved_foreground) {
-                        saveSavedTrip(trip);
-                        viewHolder.mSaveButton.setImageResource(R.mipmap.saved_foreground);
-                        viewHolder.mSaveButton.setTag(R.mipmap.saved_foreground);
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && (int) viewHolder.mSaveButton.getTag() == R.drawable.unsaved) {
+                        saveSavedTrip(trip, viewHolder);
                     }
-                    else if((int)viewHolder.mSaveButton.getTag() == R.mipmap.saved_foreground) {
-                        viewHolder.mSaveButton.setImageResource(R.mipmap.unsaved_foreground);
-                        viewHolder.mSaveButton.setTag(R.mipmap.unsaved_foreground);
-                        SavedTrips savedTrip = new SavedTrips();
-                        savedTrip.setTrip(trip);
-                        mTrip.setSaveCount(mTrip.getSaveCount() - 1);
-                        savedTrip.setUser(ParseUser.getCurrentUser());
-                        savedTrip.deleteInBackground(new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-
-                            }
-                        });
+                    else if((int) viewHolder.mSaveButton.getTag() == R.drawable.saved) {
+                        unSaveSavedTrip(trip, viewHolder);
 
                     }
-                    return super.onDoubleTap(e);
+                    return super.onDoubleTap(event);
                 }
 
                 @Override
@@ -116,7 +102,31 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         });
     }
 
-    private void saveSavedTrip(Trip trip) {
+    private void unSaveSavedTrip(Trip trip, ViewHolder viewHolder) {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        String savedTripId = mTripToSavedTrip.get(trip.getObjectId());
+        query.getInBackground(savedTripId, ((object, e1) -> {
+            if(e1 == null) {
+                object.deleteInBackground(e -> {
+                    if(e == null) {
+                        Toast.makeText(mContext, "Trip unsaved", Toast.LENGTH_SHORT).show();
+                        if(trip.getSaveCount() > 0) trip.setSaveCount(trip.getSaveCount() - 1);
+                        trip.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                viewHolder.mSaveButton.setImageResource(R.drawable.unsaved);
+                                viewHolder.mSaveButton.setTag(R.drawable.unsaved);
+                                setTripToSavedTrip();
+
+                            }
+                        });
+                    }
+                });
+            }
+        }));
+    }
+
+    private void saveSavedTrip(Trip trip, ViewHolder viewHolder) {
         SavedTrips savedTrips = new SavedTrips();
         savedTrips.setTrip(trip);
         savedTrips.setUser(ParseUser.getCurrentUser());
@@ -128,62 +138,62 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                     Log.e(TAG, "Error saving trip", exception);
                 }
                 Toast.makeText(mContext, R.string.saveSuccess, Toast.LENGTH_SHORT).show();
-            }
-        });
+                setTripToSavedTrip();
+                trip.setSaveCount(trip.getSaveCount() + 1);
+                trip.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException exception) {
+                        if(exception != null) {
+                            Log.e(TAG, "Error saving trip", exception);
+                            return;
+                        }
+                        viewHolder.mSaveButton.setImageResource(R.drawable.saved);
+                        viewHolder.mSaveButton.setTag(R.drawable.saved);
 
-        trip.setSaveCount(trip.getSaveCount() + 1);
-        trip.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException exception) {
-                if(exception != null) {
-                    Log.e(TAG, "Error saving trip", exception);
-                }
+                    }
+                });
             }
         });
 
     }
 
-//    private void querySavedTrips() {
-//        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
-//        query.include(Trip.KEY_USER);
-//        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
-//        query.findInBackground(new FindCallback<SavedTrips>() {
-//            @Override
-//            public void done(List<SavedTrips> savedTrips, ParseException exception) {
-//                if(exception != null) {
-//                    Log.e(TAG, "Issue with getting saved trips", exception);
-//                }
-//                for(SavedTrips trip : savedTrips) {
-//                    String objId = trip.getTrip().getObjectId();
-//                    if(!mSavedTrips.contains(objId)) {
-//                        mSavedTrips.add(trip.getTrip().getObjectId());
-//                    }
-//
-//                }
-//            }
-//        });
-//    }
+    private void setTripToSavedTrip() {
+        ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
+        query.include(Trip.KEY_USER);
+        query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<SavedTrips>() {
+            @Override
+            public void done(List<SavedTrips> savedTrips, ParseException exception) {
+                if(exception != null) {
+                    Log.e(TAG, "Issue with getting saved trips", exception);
+                }
+                for(SavedTrips trip : savedTrips) {
+                    mTripToSavedTrip.put(trip.getTrip().getObjectId(), trip.getObjectId());
+                }
+                Log.i(TAG, "trip to saved trip id: " + mTripToSavedTrip);
+            }
+        });
+    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-//        Trip trip = (Trip) mTrips.get(position);
-        mTrip = (Trip) mTrips.get(position);
-
-        if(mAllSavedTrips.contains(mTrip.getObjectId())) {
-            holder.mSaveButton.setImageResource(R.mipmap.saved_foreground);
-            holder.mSaveButton.setTag(R.mipmap.saved_foreground);
+        Trip trip = mTrips.get(position);
+        if(mAllSavedTrips.contains(trip.getObjectId())) {
+            holder.mSaveButton.setImageResource(R.drawable.saved);
+            holder.mSaveButton.setTag(R.drawable.saved);
         } else {
-            holder.mSaveButton.setImageResource(R.mipmap.unsaved_foreground);
-            holder.mSaveButton.setTag(R.mipmap.unsaved_foreground);
+            holder.mSaveButton.setImageResource(R.drawable.unsaved);
+            holder.mSaveButton.setTag(R.drawable.unsaved);
         }
-        holder.mRootView.setTag(mTrip);
+        holder.mRootView.setTag(trip);
         try {
-            holder.mTvTripName.setText(mTrip.fetchIfNeeded().getString(TRIP_TITLE));
+            holder.mTvTripName.setText(trip.fetchIfNeeded().getString(TRIP_TITLE));
         } catch (ParseException exception) {
             exception.printStackTrace();
         }
-        ParseFile image = mTrip.getImage();
+        ParseFile image = trip.getImage();
         Glide.with(mContext).load(image.getUrl()).into(holder.mIvTripPic);
+        onTripClicked(holder);
     }
 
     @Override
@@ -193,12 +203,14 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
     // Clean all elements of the recycler
     public void clear() {
+        mAllSavedTrips.clear();
         mTrips.clear();
         notifyDataSetChanged();
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<Trip> list) {
+    public void addAll(List<Trip> list, List<String> savedTrips) {
+        mAllSavedTrips.addAll(savedTrips);
         mTrips.addAll(list);
         notifyDataSetChanged();
     }
@@ -212,15 +224,13 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
 
         private View mRootView;
         private ImageView mIvTripPic;
-        private View mVPalette;
         private TextView mTvTripName;
-        private ImageButton mSaveButton;
+        private ImageView mSaveButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mRootView = itemView;
             mIvTripPic = itemView.findViewById(R.id.ivTripPic);
-            mVPalette = itemView.findViewById(R.id.vPalette);
             mTvTripName = itemView.findViewById(R.id.tvTripName);
             mSaveButton = itemView.findViewById(R.id.ibSave);
         }

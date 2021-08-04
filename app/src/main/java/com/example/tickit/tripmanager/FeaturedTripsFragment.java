@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,6 +77,7 @@ public class FeaturedTripsFragment extends Fragment {
     ParseGeoPoint mGeopoint = null;
     int mMiles = DISTANCE_LIMIT_DEFAULT;
     boolean mReverse = false;
+    private SwipeRefreshLayout swipeContainer;
 
     public FeaturedTripsFragment() {
         // Required empty public constructor
@@ -112,11 +114,22 @@ public class FeaturedTripsFragment extends Fragment {
         queryTrips();
         queryAllSavedTrips();
         querySavedTrips();
+        onLocationFilterClick();
 
         ArrayAdapter<String> milesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, MILES);
         mBinding.milesDropdown.setAdapter(milesAdapter);
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, ORDER);
         mBinding.orderDropdown.setAdapter(sortAdapter);
+
+        mBinding.pbLoading.setVisibility(ProgressBar.VISIBLE);
+        mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
+            @Override
+            public void locationChanged() {
+                queryNearbyTrips(DISTANCE_LIMIT_DEFAULT);
+                onFilterClick();
+                onSortClicked();
+            }
+        });
 
         // Set Featured trips recycler view
         mFeaturedAdapter = new TripsAdapter(getContext(), mFeaturedTrips, getActivity(), mAllSavedTrips);
@@ -129,25 +142,6 @@ public class FeaturedTripsFragment extends Fragment {
         LinearLayoutManager linearLayoutManagerNearby = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvNearbyTrips.setAdapter(mNearbyAdapter);
         mBinding.rvNearbyTrips.setLayoutManager(linearLayoutManagerNearby);
-
-        mBinding.pbLoading.setVisibility(ProgressBar.VISIBLE);
-        mCurrentLocation.setLocationListenerCallback(new CurrentLocation.LocationListenerCallback() {
-            @Override
-            public void locationChanged() {
-                queryNearbyTrips(DISTANCE_LIMIT_DEFAULT);
-                onFilterClick();
-                onSortClicked();
-            }
-        });
-
-        mBinding.etLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(getActivity());
-                startActivityForResult(intent, AUTOCOMPLETE_CODE);
-            }
-        });
 
         // Set Saved trips recycler view
         mSavedAdapter = new TripsAdapter(getContext(), mSavedTrips, getActivity(), mAllSavedTrips);
@@ -180,6 +174,17 @@ public class FeaturedTripsFragment extends Fragment {
                 queryNearbyTrips(mMiles);
                 mNearbyAdapter.clear();
                 mNearbyAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void onLocationFilterClick() {
+        mBinding.etLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(getActivity());
+                startActivityForResult(intent, AUTOCOMPLETE_CODE);
             }
         });
     }
@@ -350,5 +355,11 @@ public class FeaturedTripsFragment extends Fragment {
             getLatLng();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void notifyAdapterChange() {
+        mSavedAdapter.notifyDataSetChanged();
+        mFeaturedAdapter.notifyDataSetChanged();
+        mNearbyAdapter.notifyDataSetChanged();
     }
 }

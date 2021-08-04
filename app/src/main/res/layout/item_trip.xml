@@ -28,7 +28,7 @@
                 android:layout_height="160dp"
                 android:scaleType="centerCrop"/>
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/ibSave"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
