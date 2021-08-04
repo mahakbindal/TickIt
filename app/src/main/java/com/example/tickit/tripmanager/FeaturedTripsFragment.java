@@ -325,7 +325,6 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
         query.include(Trip.KEY_USER);
         query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
-        query.whereEqualTo(Trip.KEY_PRIVATE, false);
         query.findInBackground(new FindCallback<SavedTrips>() {
             @Override
             public void done(List<SavedTrips> savedTrips, ParseException exception) {
