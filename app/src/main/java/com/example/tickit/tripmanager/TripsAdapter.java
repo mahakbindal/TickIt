@@ -44,13 +44,11 @@ import java.util.Map;
 public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
     public static final String TAG = "TripsAdapter";
-    public static final String TRIP_TITLE = "title";
     static Context mContext;
     private List<Trip> mTrips;
     private Activity mActivity;
     private List<String> mAllSavedTrips;
     private Map<String, String> mTripToSavedTrip = new HashMap<>();
-    private boolean mLiked = false;
 
     public TripsAdapter(Context context, List<Trip> mTrips, Activity activity, List<String> allSavedTrips) {
         this.mContext = context;
@@ -76,12 +74,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                 @Override
                 public boolean onDoubleTap(MotionEvent event) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && (int) viewHolder.mSaveButton.getTag() == R.drawable.unsaved) {
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mTripToSavedTrip.containsKey(trip.getObjectId()) && (int) viewHolder.mSaveButton.getTag() == R.drawable.unsaved) {
                         saveSavedTrip(trip, viewHolder);
                     }
                     else if((int) viewHolder.mSaveButton.getTag() == R.drawable.saved) {
                         unSaveSavedTrip(trip, viewHolder);
-
                     }
                     return super.onDoubleTap(event);
                 }
@@ -105,11 +102,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
     private void unSaveSavedTrip(Trip trip, ViewHolder viewHolder) {
         ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
         String savedTripId = mTripToSavedTrip.get(trip.getObjectId());
-        query.getInBackground(savedTripId, ((object, e1) -> {
-            if(e1 == null) {
-                object.deleteInBackground(e -> {
-                    if(e == null) {
-                        Toast.makeText(mContext, "Trip unsaved", Toast.LENGTH_SHORT).show();
+        query.getInBackground(savedTripId, ((object, exception) -> {
+            if(exception == null) {
+                object.deleteInBackground(deleteException -> {
+                    if(deleteException == null) {
+                        Toast.makeText(mContext, R.string.unsave_trip, Toast.LENGTH_SHORT).show();
                         if(trip.getSaveCount() > 0) trip.setSaveCount(trip.getSaveCount() - 1);
                         trip.saveInBackground(new SaveCallback() {
                             @Override
@@ -187,7 +184,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
         }
         holder.mRootView.setTag(trip);
         try {
-            holder.mTvTripName.setText(trip.fetchIfNeeded().getString(TRIP_TITLE));
+            holder.mTvTripName.setText(trip.fetchIfNeeded().getString(Trip.KEY_TITLE));
         } catch (ParseException exception) {
             exception.printStackTrace();
         }

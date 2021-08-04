@@ -12,6 +12,7 @@ public class Trip extends ParseObject {
     public static final String KEY_IMAGE = "image";
     public static final String KEY_TITLE = "title";
     public static final String KEY_SAVE_COUNT = "saveCount";
+    public static final String KEY_PRIVATE = "isPrivate";
 
     public ParseUser getUser() {
         return getParseUser(KEY_USER);
@@ -37,7 +38,11 @@ public class Trip extends ParseObject {
         put(KEY_TITLE, title);
     }
 
-    public int getSaveCount() {return (int) getNumber(KEY_SAVE_COUNT);}
+    public int getSaveCount() { return (int) getNumber(KEY_SAVE_COUNT); }
 
-    public void setSaveCount(int saveCount) {put(KEY_SAVE_COUNT, saveCount);}
+    public void setSaveCount(int saveCount) { put(KEY_SAVE_COUNT, saveCount); }
+
+    public boolean getIsPrivate() { return getBoolean(KEY_PRIVATE); }
+
+    public void setIsPrivate(boolean isPrivate) { put(KEY_PRIVATE, isPrivate); }
 }

@@ -21,4 +21,10 @@
     <string name="nullMap">Google Map is not initialized</string>
     <string name="share">"Sharing my trip: "</string>
     <string name="nearbyLocation">Location is empty. Using current location.</string>
+    <string name="unsave_trip">Trip unsaved</string>
+    <string name="empty_comment">Your comment is empty</string>
+    <string name="miles">" miles"</string>
+    <string name="enumerate_loc">". "</string>
+    <string name="share_trip">"Sharing my trip: "</string>
+    <string name="create_new_trip">Create New Trip</string>
 </resources>

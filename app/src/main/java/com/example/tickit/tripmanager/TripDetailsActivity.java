@@ -1,6 +1,7 @@
 package com.example.tickit.tripmanager;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -95,7 +96,7 @@ public class TripDetailsActivity extends AppCompatActivity {
                 queryTripAndInitializeUi(mTrip);
             }
         });
-
+        getSupportActionBar().setTitle(mTrip.getTitle());
         mBinding.tvTripTitle.setText(mTrip.getTitle());
         try {
             String username = mTrip.getUser().fetchIfNeeded().getUsername();
@@ -120,7 +121,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String comment = mBinding.etComment.getText().toString();
                 if(comment.isEmpty()) {
-                    Toast.makeText(TripDetailsActivity.this, "Your comment is empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TripDetailsActivity.this, R.string.empty_comment, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 saveTripComment(comment);
@@ -226,7 +227,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             public void getDurationCallback() {
                 String duration = mRouteHelper.getDuration();
                 mBinding.tvDuration.setText(duration);
-                String distance = mRouteHelper.getDistance() + " miles";
+                String distance = mRouteHelper.getDistance() + getResources().getString(R.string.miles);
                 mBinding.tvDistance.setText(distance);
             }
         });
@@ -251,7 +252,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             mLocationDetails.add(newLocation);
             mBinding.locationList.addView(newLocation);
             String location = mTripDetails.get(i).getLocation();
-            newLocation.setTextValue(i+1 + ". " + location);
+            newLocation.setTextValue(i+1 + getResources().getString(R.string.enumerate_loc) + location);
             waypointNameList.add(location);
         }
         return waypointNameList;
@@ -276,7 +277,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         if(item.getItemId() == R.id.action_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "Sharing my trip: " + mBinding.tvTripTitle.getText().toString());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.share_trip) + mBinding.tvTripTitle.getText().toString());
             sendIntent.setType(SHARE_TYPE);
 
             Intent shareIntent = Intent.createChooser(sendIntent, null);

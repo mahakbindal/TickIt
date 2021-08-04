@@ -13,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -103,6 +104,7 @@ public class CreateFragment extends Fragment {
         // Initialize view
         mBinding = FragmentCreateBinding.inflate(inflater, container, false);
 
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.create_new_trip);
         // Initialize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -362,6 +364,7 @@ public class CreateFragment extends Fragment {
         if(mPhotoFile != null) {
             trip.setImage(mPhotoFile);
         }
+        if(mBinding.rbPrivate.isChecked()) trip.setIsPrivate(true);
         List<List<Address>> locations = mGoogleMapRouteHelper.getLocationList();
 
         // Iterate through mWaypointsList to save each location in TripDetails table

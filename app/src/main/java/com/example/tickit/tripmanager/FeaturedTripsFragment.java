@@ -242,6 +242,7 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
         query.include(Trip.KEY_USER);
         query.whereNotEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Trip.KEY_PRIVATE, false);
         query.addDescendingOrder(Trip.KEY_CREATED_AT);
 
         query.findInBackground(new FindCallback<Trip>() {
@@ -263,6 +264,7 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<Trip> tripQuery = ParseQuery.getQuery(Trip.class);
         tripQuery.include(Trip.KEY_USER);
         tripQuery.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        tripQuery.whereEqualTo(Trip.KEY_PRIVATE, false);
         tripQuery.findInBackground(new FindCallback<Trip>() {
             @Override
             public void done(List<Trip> trips, ParseException exception) {
@@ -318,6 +320,7 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<SavedTrips> query = ParseQuery.getQuery(SavedTrips.class);
         query.include(Trip.KEY_USER);
         query.whereEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Trip.KEY_PRIVATE, false);
         query.findInBackground(new FindCallback<SavedTrips>() {
             @Override
             public void done(List<SavedTrips> savedTrips, ParseException exception) {
@@ -335,6 +338,7 @@ public class FeaturedTripsFragment extends Fragment {
         ParseQuery<Trip> query = new ParseQuery<>(Trip.class);
         query.include(Trip.KEY_SAVE_COUNT);
         query.whereNotEqualTo(Trip.KEY_SAVE_COUNT, 0);
+        query.whereEqualTo(Trip.KEY_PRIVATE, false);
         query.orderByDescending(Trip.KEY_SAVE_COUNT);
         query.setLimit(SAVED_TRIPS_LIMIT);
         query.findInBackground(new FindCallback<Trip>() {

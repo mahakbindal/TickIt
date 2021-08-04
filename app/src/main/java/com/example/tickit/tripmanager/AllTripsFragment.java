@@ -81,6 +81,7 @@ public class AllTripsFragment extends Fragment {
         ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
         query.include(Trip.KEY_USER);
         query.whereNotEqualTo(Trip.KEY_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Trip.KEY_PRIVATE, false);
         query.addDescendingOrder(Trip.KEY_CREATED_AT);
 
         query.findInBackground(new FindCallback<Trip>() {

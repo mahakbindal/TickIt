@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -36,7 +37,7 @@ public class ExploreTripsFragment extends Fragment {
 
         TabLayout tabLayout = getView().findViewById(R.id.tabLayoutExplore);
         ViewPager viewPager = getView().findViewById(R.id.viewPagerExplore);
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.exploreTrip);
         ExploreTripsAdapter exploreTripsAdapter = new ExploreTripsAdapter(getChildFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(exploreTripsAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

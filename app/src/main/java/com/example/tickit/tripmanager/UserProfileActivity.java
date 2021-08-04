@@ -66,6 +66,9 @@ public class UserProfileActivity extends AppCompatActivity {
         ParseQuery<Trip> query = ParseQuery.getQuery(Trip.class);
         query.include(Trip.KEY_USER);
         query.whereEqualTo(Trip.KEY_USER, userObjectId);
+        if(!((ParseUser.getCurrentUser().getObjectId()).equals(userObjectId.getObjectId()))) {
+            query.whereEqualTo(Trip.KEY_PRIVATE, false);
+        }
         query.addDescendingOrder(Trip.KEY_CREATED_AT);
 
         query.findInBackground(new FindCallback<Trip>() {
