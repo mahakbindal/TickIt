@@ -67,7 +67,19 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="imagePath" value="/private/var/folders/c0/5f04hp2s1dbfl63vdg4f3ddh0000gn/T/ic_android_black_24dp.xml" />
+                                                <entry key="color" value="b85042" />
+                                                <entry key="imagePath" value="/private/var/folders/c0/5f04hp2s1dbfl63vdg4f3ddh0000gn/T/baseline_close_24.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="foregroundClipartAsset">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material/icons/materialicons/close/baseline_close_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -79,7 +91,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Desktop/unsaved.png" />
+                                                <entry key="imagePath" value="$USER_HOME$/Downloads/IMG_0674.jpg" />
                                                 <entry key="scalingPercent" value="99" />
                                               </map>
                                             </option>
@@ -112,7 +124,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="unsaved" />
+                                      <entry key="foregroundAssetType" value="CLIP_ART" />
+                                      <entry key="outputName" value="delete" />
                                     </map>
                                   </option>
                                 </PersistentState>

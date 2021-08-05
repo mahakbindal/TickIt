@@ -21,13 +21,13 @@
 
     <ImageButton
         android:id="@+id/ibRemove"
-        android:layout_width="40dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-60dp"
-        android:layout_marginTop="10dp"
-        android:scaleType="centerInside"
+        android:layout_marginStart="-70dp"
+        android:layout_marginTop="5dp"
         android:adjustViewBounds="true"
         android:background="@color/white"
-        app:srcCompat="@android:drawable/ic_delete" />
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/delete_foreground" />
 
 </LinearLayout>
