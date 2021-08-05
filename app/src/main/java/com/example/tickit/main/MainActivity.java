@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.action_explore:
                         fragment = new ExploreTripsFragment();
-                        Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.exploreTrip, Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_create:
                         fragment = new CreateFragment();
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_trips:
                     default:
                         fragment = new ProfileFragment();
-                        Toast.makeText(MainActivity.this, R.string.exploreTrip, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.myTrips, Toast.LENGTH_SHORT).show();
                         break;
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();

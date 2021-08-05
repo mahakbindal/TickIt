@@ -274,7 +274,6 @@ public class FeaturedTripsFragment extends Fragment {
                 List<String> tripIds = new ArrayList<>();
                 for (Trip trip : trips) {
                     tripIds.add(trip.getObjectId());
-                    Log.i(TAG, trip.getTitle());
                 }
                 ParseGeoPoint geoPoint = mCurrentLocation.getCurrentLocation();
                 if(mGeopoint != null) {
@@ -348,7 +347,6 @@ public class FeaturedTripsFragment extends Fragment {
         query.findInBackground(new FindCallback<Trip>() {
             @Override
             public void done(List<Trip> savedTrips, ParseException exception) {
-                Log.i(TAG, "Saved trips: " + savedTrips);
                 mSavedTrips.addAll(savedTrips);
                 mSavedAdapter.notifyDataSetChanged();
             }

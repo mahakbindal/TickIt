@@ -47,7 +47,7 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         ParseUser userObjectId = intent.getParcelableExtra(USER_ID_EXTRA);
         queryUserTrips(userObjectId);
-        mBinding.tvUsername.setText("@" + userObjectId.getUsername());
+        mBinding.tvUsername.setText(getResources().getString(R.string.at_sign) + userObjectId.getUsername());
 
         if((ParseUser.getCurrentUser().getObjectId()).equals(userObjectId.getObjectId())) {
             mMyTripsAdapter = new MyTripsAdapter(this, UserProfileActivity.this, mAllUserTrips);

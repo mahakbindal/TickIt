@@ -72,11 +72,15 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> 
                 @Override
                 public boolean onDoubleTap(MotionEvent event) {
                     Trip trip = mTrips.get(viewHolder.getAdapterPosition());
-                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) && !mTripToSavedTrip.containsKey(trip.getObjectId()) && (int) viewHolder.mSaveButton.getTag() == R.drawable.unsaved) {
+                    if(!(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) &&
+                            !mTripToSavedTrip.containsKey(trip.getObjectId()) && (int) viewHolder.mSaveButton.getTag() == R.drawable.unsaved) {
                         saveSavedTrip(trip, viewHolder);
                     }
                     else if((int) viewHolder.mSaveButton.getTag() == R.drawable.saved) {
                         unSaveSavedTrip(trip, viewHolder);
+                    }
+                    else if(trip.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                        Toast.makeText(mContext, R.string.cannot_save, Toast.LENGTH_SHORT).show();
                     }
                     return super.onDoubleTap(event);
                 }

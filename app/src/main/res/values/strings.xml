@@ -30,4 +30,6 @@
     <string name="days">" days, "</string>
     <string name="hours">" hours, "</string>
     <string name="minutes">" minutes"</string>
+    <string name="cannot_save">This is your trip. Unable to save.</string>
+    <string name="at_sign">\@</string>
 </resources>

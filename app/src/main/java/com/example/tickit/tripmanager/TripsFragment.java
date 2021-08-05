@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.tickit.R;
 import com.example.tickit.databinding.FragmentTripsBinding;
 import com.example.tickit.helpers.EndlessRecyclerViewScrollListener;
 import com.example.tickit.main.MainActivity;
@@ -62,17 +63,6 @@ public class TripsFragment extends Fragment {
 
         mAllSavedTrips = new ArrayList<>();
         queryAllSavedTrips();
-        mBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchTimelineAsync();
-            }
-        });
-        // Configure the refreshing colors
-        mBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
 
         mAllTrips = new ArrayList<>();
 
@@ -90,6 +80,8 @@ public class TripsFragment extends Fragment {
             }
         };
         mBinding.rvTrips.addOnScrollListener(mScrollListener);
+        String username = getResources().getString(R.string.at_sign) + ParseUser.getCurrentUser().getUsername();
+        mBinding.tvUsername.setText(username);
         queryTrips();
     }
 
@@ -112,12 +104,6 @@ public class TripsFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    private void fetchTimelineAsync() {
-        mAdapter.clear();
-        queryTrips();
-        mBinding.swipeContainer.setRefreshing(false);
     }
 
     private void queryTrips() {
