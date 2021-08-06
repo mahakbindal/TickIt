@@ -141,13 +141,17 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 Here's a walkthrough of implemented user stories:
 
 **Explore Page**
+
 <img src='./explore.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 **Create New Trip**
+
 <img src='./createTrip.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 **Profile Page**
+
 <img src='./myProfile.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 **Trip Details**
+
 <img src='./tripDetails.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
