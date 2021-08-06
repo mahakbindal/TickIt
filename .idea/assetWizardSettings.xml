@@ -91,7 +91,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Downloads/IMG_0674.jpg" />
+                                                <entry key="imagePath" value="$USER_HOME$/Downloads/IMG_0675.jpg" />
                                                 <entry key="scalingPercent" value="99" />
                                               </map>
                                             </option>
@@ -124,8 +124,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundAssetType" value="CLIP_ART" />
-                                      <entry key="outputName" value="delete" />
+                                      <entry key="outputName" value="logo2" />
                                     </map>
                                   </option>
                                 </PersistentState>

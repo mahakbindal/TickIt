@@ -8,7 +8,7 @@
 
 ## Overview
 ### Description
-TickIt is a travel scrapbook and planner. It allows users to input destinations from their travels, and maps out their journey on Google Maps. They can then tap various locations to add pictures from a specific place. There will also be sharing functionality such that a user can share their itinerary with travel companions or people interested in going to that destination. They will also have the option to make their itinerary public, so that it can be posted to an "Explore" page where any user on the app can view it.
+TickIt is a travel scrapbook and planner. It allows users to input destinations from their travels, and maps out their journey on Google Maps. They can then tap various locations to add descriptions from a specific place. They will also have the option to make their itinerary private, so that it can be hidden from other users in the "Discover" page. Users can view featured, nearby, and most saved trips, and also interact with trips by adding comments
 
 ### App Evaluation
 - **Category:** Travel, Social, Lifestyle
@@ -34,10 +34,8 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 
 **Optional Nice-to-have Stories**
 
-- [ ] User can make their trip private
+- [x] User can make their trip private
 - [x] User can see their itinerary and other user's itineraries in the Explore page, if public
-- [ ] User can share itinerary with other users they choose
-- [ ] User can add pictures to specific locations in their itinerary
 - [x] User can double tap to save other users' itineraries
 - [x] User can search in the Explore page to find other users' itineraries
 - [x] User can view trip metrics
