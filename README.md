@@ -20,7 +20,7 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 
 ## Product Spec
 
-### 1. User Stories (Required and Optional)
+### User Stories (Required and Optional)
 
 **Required Must-have Stories**
 
@@ -50,7 +50,7 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 - [x] User can share their or other users' trips
 - [x] User can choose an image from their gallery to set as a cover image for the trip
 
-### 2. Screen Archetypes
+### Screen Archetypes
 
 * Login Screen
    * User can login
@@ -64,7 +64,7 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
     * User can "Create a New Trip"
     * User can add locations from their trip
 
-### 3. Navigation
+### Navigation
 
 **Tab Navigation** (Tab to Screen)
 
@@ -135,3 +135,19 @@ TickIt is a travel scrapbook and planner. It allows users to input destinations 
 * **Explore Screen**
     * **(Read/GET)** Query all users’ trips
     * **(Update/PUT)** Update all trips after user creates new one
+
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+**Explore Page**
+<img src='./explore.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+**Create New Trip**
+<img src='./createTrip.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+**Profile Page**
+<img src='./myProfile.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+**Trip Details**
+<img src='./tripDetails.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
