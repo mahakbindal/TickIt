@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -44,6 +45,8 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.maps.GeoApiContext;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -55,10 +58,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -92,6 +99,8 @@ public class CreateFragment extends Fragment {
     private List<String> mRawLocationList;
     public PostTransitionCallback mPostTransitionCallback;
     private Map<String, String> locationTitleDesc = new HashMap<>();
+    private Date mStartDate;
+    private Date mEndDate;
 
     public CreateFragment() {
         // Required empty public constructor
@@ -118,6 +127,31 @@ public class CreateFragment extends Fragment {
                 }
                 UiSettings uiSettings = mGoogleMap.getUiSettings();
                 uiSettings.setZoomControlsEnabled(true);
+            }
+        });
+
+        MaterialDatePicker.Builder<Pair<Long, Long>> materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker();        materialDateBuilder.setTitleText("Select Trip Dates");
+        final MaterialDatePicker materialDatePicker = materialDateBuilder.build();
+
+        mBinding.etDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                materialDatePicker.show(getChildFragmentManager(), "MATERIAL_DATE_PICKER");
+            }
+        });
+
+        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+                Pair selectedDates = (Pair) materialDatePicker.getSelection();
+                final Pair<Date, Date> rangeDate = new Pair<>(new Date((Long) selectedDates.first), new Date((Long) selectedDates.second));
+                mStartDate = rangeDate.first;
+                mEndDate = rangeDate.second;
+                SimpleDateFormat simpleFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+                Date start = new Date((Long)selectedDates.first);
+                Date end = new Date((Long)selectedDates.second);
+                String date = simpleFormat.format(start) + " – " + simpleFormat.format(end);
+                mBinding.etDate.setText(date);
             }
         });
 
@@ -367,6 +401,8 @@ public class CreateFragment extends Fragment {
             trip.setImage(mPhotoFile);
         }
         if(mBinding.rbPrivate.isChecked()) trip.setIsPrivate(true);
+        trip.setStartDate(mStartDate);
+        trip.setEndDate(mEndDate);
         List<List<Address>> locations = mGoogleMapRouteHelper.getLocationList();
 
         // Iterate through mWaypointsList to save each location in TripDetails table

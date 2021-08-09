@@ -5,6 +5,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.Date;
+
 @ParseClassName("Trip")
 public class Trip extends ParseObject {
 
@@ -13,6 +15,8 @@ public class Trip extends ParseObject {
     public static final String KEY_TITLE = "title";
     public static final String KEY_SAVE_COUNT = "saveCount";
     public static final String KEY_PRIVATE = "isPrivate";
+    public static final String KEY_START_DATE = "startDate";
+    public static final String KEY_END_DATE = "endDate";
 
     public ParseUser getUser() {
         return getParseUser(KEY_USER);
@@ -45,4 +49,12 @@ public class Trip extends ParseObject {
     public boolean getIsPrivate() { return getBoolean(KEY_PRIVATE); }
 
     public void setIsPrivate(boolean isPrivate) { put(KEY_PRIVATE, isPrivate); }
+
+    public Date getStartDate() { return getDate(KEY_START_DATE); }
+
+    public void setStartDate(Date startDate) { put(KEY_START_DATE, startDate); }
+
+    public Date getEndDate() { return getDate(KEY_END_DATE); }
+
+    public void setEndDate(Date endDate) { put(KEY_END_DATE, endDate); }
 }

@@ -94,12 +94,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <EditText
                 android:id="@+id/etLocation"
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:focusable="false"
                 android:inputType="textPersonName"
                 android:hint="Filter by location" />
 
